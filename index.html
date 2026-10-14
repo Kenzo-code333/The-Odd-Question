@@ -5,40 +5,48 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>The Odd Question</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="theme-color" content="#FBF5E9">
+<meta name="theme-color" content="#0A0E15">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Young+Serif&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700;800&family=Space+Mono:wght@700&display=swap">
 <style>
-/* Layout: one centred column, one task per screen, big tap targets stacked top to bottom.
-   Deliberately a single warm light look (cream paper, deep ink) for maximum legibility. */
+/* Layout: a game-show console. One centred column on a dark grid, a mono "phase" eyebrow,
+   one big headline, and the main action pinned to the bottom of every screen.
+   Deliberately a single dark look; all text stays at 24px or larger for older players. */
 :root {
-  --bg: #FBF5E9;          /* cream paper */
-  --surface: #FFFDF7;     /* card */
-  --ink: #2A231E;         /* main text, deep warm brown */
-  --muted: #51463C;       /* secondary text, still high contrast */
-  --line: #E2D5BF;        /* soft borders */
-  --sage: #2E5B4E;        /* primary buttons */
-  --sage-press: #234A3F;
-  --sage-soft: #DDE9E2;
-  --rose-soft: #F5E0D6;
-  --rose-ink: #7A3524;
-  --night: #141010;        /* Odd One banner */
-  --alarm: #FF3B30;        /* Odd One red */
-  --honey-soft: #F6E7BE;
-  --honey-ink: #6B4E0C;
-  --on-sage: #FFFFFF;
-  --focus: #1F5FA8;
-  --font-display: "Young Serif", Georgia, "Times New Roman", serif;
-  --font-body: "Atkinson Hyperlegible", Verdana, "Segoe UI", Arial, sans-serif;
-  color-scheme: light;
+  --bg: #0A0E15;            /* console night */
+  --grid: rgba(120, 170, 220, .07);
+  --panel: #141B26;
+  --panel-2: #1B2433;
+  --line: #2A3547;
+  --text: #F3F6FA;
+  --muted: #AEB9C9;         /* secondary text, ~9:1 on --bg */
+  --teal: #1FE3D0;          /* group / go */
+  --teal-deep: #0DB3A6;
+  --teal-ink: #04211F;      /* text on teal */
+  --teal-dim: rgba(31, 227, 208, .14);
+  --amber: #F4B63F;         /* rounds, leaders */
+  --amber-dim: rgba(244, 182, 63, .14);
+  --red: #FF4B4B;           /* the Odd One */
+  --orange: #FF7B45;
+  --red-dim: rgba(255, 75, 75, .14);
+  --font-display: "Lexend", "Segoe UI", Verdana, Arial, sans-serif;
+  --font-body: "Lexend", "Segoe UI", Verdana, Arial, sans-serif;
+  --font-mono: "Space Mono", "Courier New", ui-monospace, monospace;
+  color-scheme: dark;
 }
 html, body { height: 100%; }
 * { box-sizing: border-box; }
 body {
   margin: 0;
-  background: var(--bg);
-  color: var(--ink);
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(31, 227, 208, .08), transparent 60%),
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 100% 100%, 44px 44px, 44px 44px;
+  background-attachment: fixed;
+  color: var(--text);
   font-family: var(--font-body);
   font-size: 26px;
   line-height: 1.45;
@@ -49,218 +57,237 @@ body {
   max-width: 680px;
   margin: 0 auto;
   min-height: 100%;
-  padding-block: 20px 40px;
+  padding-block: 20px 28px;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   display: flex;
   flex-direction: column;
 }
-.screen {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
-  animation: rise .45s ease-out both;
-}
-@keyframes rise { from { opacity: .35; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-@keyframes breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
-@media (prefers-reduced-motion: reduce) {
-  .screen, .breathe { animation: none !important; }
-}
+.screen { flex: 1; display: flex; flex-direction: column; gap: 26px; animation: rise .4s ease-out both; }
+@keyframes rise { from { opacity: .35; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes glow { 0%,100% { box-shadow: 0 0 0 0 rgba(31,227,208,.0), 0 0 24px rgba(31,227,208,.25); } 50% { box-shadow: 0 0 0 14px rgba(31,227,208,.06), 0 0 40px rgba(31,227,208,.45); } }
+@keyframes alarm { 0%,100% { box-shadow: 0 0 0 0 rgba(255,75,75,0); } 50% { box-shadow: 0 0 30px 6px rgba(255,75,75,.5); } }
+@media (prefers-reduced-motion: reduce) { .screen, .glow, .role.odd { animation: none !important; } }
 
-h1, h2 {
-  font-family: var(--font-display);
-  font-weight: 400;
-  line-height: 1.15;
-  margin: 0;
-  text-wrap: balance;
-}
-h1 { font-size: clamp(42px, 10vw, 60px); }
-h2 { font-size: clamp(34px, 8vw, 48px); }
+h1, h2 { font-family: var(--font-display); font-weight: 800; line-height: 1.1; margin: 0; text-wrap: balance; letter-spacing: -.01em; }
+h1 { font-size: clamp(44px, 11vw, 64px); }
+h2 { font-size: clamp(38px, 9.5vw, 54px); }
+h2 em { font-style: normal; color: var(--teal); text-shadow: 0 0 22px rgba(31,227,208,.45); }
 p { margin: 0; }
+b { color: var(--text); }
 .muted { color: var(--muted); }
-.small { font-size: 24px; }
 .center { text-align: center; }
 
-.topbar {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  font-size: 24px; color: var(--muted);
+/* Mono labels and eyebrows */
+.label, .eyebrow {
+  font-family: var(--font-mono); font-weight: 700; font-size: 24px;
+  letter-spacing: .05em; text-transform: uppercase; color: var(--muted);
 }
-.label {
-  font-size: 24px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--muted);
+.eyebrow { display: flex; align-items: center; justify-content: center; gap: 14px; color: var(--amber); text-align: center; }
+.eyebrow::before, .eyebrow::after { content: ""; height: 2px; width: 34px; background: currentColor; opacity: .5; border-radius: 1px; }
+
+/* Top bar */
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.badge-round {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--font-mono); font-weight: 700; font-size: 24px; letter-spacing: .05em; text-transform: uppercase;
+  color: var(--amber); background: var(--amber-dim); border: 2px solid rgba(244,182,63,.45);
+  border-radius: 12px; padding: 6px 14px;
 }
+.badge-round::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 10px var(--amber); }
+.icon-btn {
+  appearance: none; width: 68px; height: 68px; border-radius: 18px; cursor: pointer;
+  background: var(--panel-2); border: 2px solid var(--line); color: var(--text);
+  display: grid; place-items: center;
+}
+.icon-btn svg { width: 32px; height: 32px; }
 
 /* Buttons */
 button { font: inherit; color: inherit; }
 .btn {
-  appearance: none;
-  border: 3px solid transparent;
-  border-radius: 22px;
-  min-height: 92px;
-  padding: 18px 26px;
-  font-size: 30px;
-  font-weight: 700;
-  line-height: 1.2;
-  cursor: pointer;
-  width: 100%;
-  display: flex; align-items: center; justify-content: center; gap: 14px;
-  text-align: center;
-  transition: transform .12s ease, background-color .2s ease, box-shadow .2s ease;
-  touch-action: manipulation;
+  appearance: none; border: 2px solid transparent; border-radius: 20px;
+  min-height: 88px; padding: 16px 22px; width: 100%;
+  font-family: var(--font-display); font-size: 24px; font-weight: 700;
+  letter-spacing: .04em; text-transform: uppercase; line-height: 1.2;
+  display: flex; align-items: center; justify-content: center; gap: 14px; text-align: center;
+  cursor: pointer; touch-action: manipulation;
+  transition: transform .12s ease, box-shadow .2s ease, background-color .2s ease;
 }
+.btn svg { width: 26px; height: 26px; flex: none; }
 .btn:active { transform: scale(.98); }
-.btn:focus-visible, .chip:focus-visible, input:focus-visible, .seg button:focus-visible {
-  outline: 4px solid var(--focus); outline-offset: 3px;
+.btn:focus-visible, .icon-btn:focus-visible, .chip:focus-visible, input:focus-visible, .seg button:focus-visible, .vote:focus-visible, summary:focus-visible {
+  outline: 4px solid var(--amber); outline-offset: 3px;
 }
-.btn-primary { background: var(--sage); color: var(--on-sage); box-shadow: 0 6px 0 var(--sage-press); }
-.btn-primary:active { box-shadow: 0 2px 0 var(--sage-press); transform: translateY(4px); }
-.btn-primary[disabled] { background: #A9B8B1; box-shadow: none; cursor: not-allowed; color: #FFFFFF; }
-.btn-soft { background: var(--surface); border-color: var(--line); color: var(--ink); }
-.btn-soft:active { background: var(--sage-soft); }
-.btn-text {
-  background: none; border: none; color: var(--muted); text-decoration: underline;
-  font-size: 24px; min-height: 64px; padding: 8px 12px; cursor: pointer;
-}
-.row { display: flex; gap: 16px; flex-wrap: wrap; }
-.row > * { flex: 1 1 200px; }
-.stack { display: flex; flex-direction: column; gap: 18px; }
-.push { margin-top: auto; }
+.btn-go { background: linear-gradient(90deg, var(--teal-deep), var(--teal)); color: var(--teal-ink); box-shadow: 0 8px 30px rgba(31,227,208,.35); }
+.btn-danger { background: linear-gradient(90deg, #D9223F, var(--orange)); color: #FFFFFF; box-shadow: 0 8px 30px rgba(255,90,70,.3); }
+.btn-ghost { background: rgba(20,27,38,.7); border-color: rgba(31,227,208,.5); color: var(--teal); }
+.btn[disabled] { background: var(--panel-2); color: var(--muted); box-shadow: none; border-color: var(--line); cursor: not-allowed; }
+.btn-text { background: none; border: none; color: var(--muted); text-decoration: underline; font-size: 24px; min-height: 64px; padding: 8px 12px; cursor: pointer; }
+.row { display: flex; gap: 14px; flex-wrap: wrap; }
+.row > * { flex: 1 1 220px; }
+.stack { display: flex; flex-direction: column; gap: 16px; }
+.dock { margin-top: auto; padding-top: 12px; display: flex; flex-direction: column; gap: 14px; }
 
-/* Cards */
-.card {
-  background: var(--surface);
-  border: 2px solid var(--line);
-  border-radius: 26px;
-  padding: 26px;
-  display: flex; flex-direction: column; gap: 14px;
-  min-width: 0;
+/* Panels */
+.panel {
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border: 2px solid var(--line); border-radius: 22px; padding: 22px;
+  display: flex; flex-direction: column; gap: 12px; min-width: 0;
 }
-.card.sage { background: var(--sage-soft); border-color: #C3D8CC; }
-.card.rose { background: var(--rose-soft); border-color: #EBC9B9; }
-.card.honey { background: var(--honey-soft); border-color: #E8D296; }
 
 /* Setup */
-.brand { display: flex; flex-direction: column; gap: 10px; padding-top: 8px; }
-.brand .mark {
-  width: 84px; height: 84px; border-radius: 50%;
-  background: var(--honey-soft); color: var(--honey-ink);
-  font-family: var(--font-display); font-size: 58px; line-height: 84px; text-align: center;
+.brand { display: flex; flex-direction: column; gap: 14px; align-items: flex-start; padding-top: 6px; }
+.logo {
+  width: 92px; height: 92px; border-radius: 50%; display: grid; place-items: center;
+  border: 3px solid var(--teal); color: var(--teal); background: var(--teal-dim);
+  font-family: var(--font-display); font-weight: 800; font-size: 52px;
+  text-shadow: 0 0 16px rgba(31,227,208,.6);
 }
-.seg { display: flex; gap: 0; border: 3px solid var(--sage); border-radius: 22px; overflow: hidden; }
-.seg button {
-  flex: 1; min-height: 76px; border: none; background: var(--surface); color: var(--sage);
-  font-size: 26px; font-weight: 700; cursor: pointer;
-}
-.seg button[aria-pressed="true"] { background: var(--sage); color: var(--on-sage); }
-
-.players { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.seg { display: flex; border: 2px solid var(--line); border-radius: 20px; overflow: hidden; background: var(--panel); }
+.seg button { flex: 1; min-height: 76px; border: none; background: transparent; color: var(--muted); font-size: 26px; font-weight: 700; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--teal); color: var(--teal-ink); }
+.players { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
 .players li {
-  display: flex; align-items: center; gap: 14px;
-  background: var(--surface); border: 2px solid var(--line); border-radius: 18px;
-  padding: 8px 8px 8px 22px; min-height: 76px;
+  display: flex; align-items: center; gap: 14px; min-height: 76px;
+  background: var(--panel); border: 2px solid var(--line); border-radius: 18px; padding: 8px 8px 8px 18px;
 }
+.players .num { font-family: var(--font-mono); font-size: 24px; color: var(--teal); min-width: 1.6em; }
 .players .pname { flex: 1; min-width: 0; font-size: 28px; font-weight: 700; overflow-wrap: anywhere; }
 .chip {
-  appearance: none; border: 2px solid var(--line); background: var(--bg);
-  border-radius: 14px; min-width: 64px; min-height: 60px; padding: 6px 16px;
-  font-size: 24px; font-weight: 700; color: var(--rose-ink); cursor: pointer;
+  appearance: none; min-width: 64px; min-height: 60px; border-radius: 14px; cursor: pointer;
+  background: var(--red-dim); border: 2px solid rgba(255,75,75,.4); color: var(--red);
+  display: grid; place-items: center;
 }
+.chip svg { width: 26px; height: 26px; }
 .addrow { display: flex; gap: 12px; flex-wrap: wrap; }
 .addrow input {
-  flex: 1 1 220px; min-width: 0;
-  font: inherit; font-size: 28px; color: var(--ink);
-  background: #FFFFFF; border: 3px solid #BFAE93; border-radius: 18px;
-  min-height: 80px; padding: 10px 20px;
+  flex: 1 1 220px; min-width: 0; min-height: 80px; padding: 10px 20px;
+  font: inherit; font-size: 28px; color: var(--text);
+  background: #0E141E; border: 2px solid #3A4860; border-radius: 18px;
 }
-.addrow input::placeholder { color: #75695C; }
+.addrow input::placeholder { color: #8D99AB; }
 .addrow .btn { width: auto; flex: 0 0 auto; min-height: 80px; }
-.stepper { display: flex; align-items: center; gap: 16px; }
-.stepper .btn { width: 92px; flex: 0 0 auto; font-size: 40px; padding: 0; }
-.stepper .val {
-  flex: 1; text-align: center; font-family: var(--font-display); font-size: 52px;
-  font-variant-numeric: tabular-nums;
-}
-details.rules { font-size: 24px; padding-block: 14px; gap: 0; }
+.stepper { display: flex; align-items: center; gap: 14px; }
+.stepper .btn { width: 88px; flex: 0 0 auto; padding: 0; font-size: 40px; letter-spacing: 0; }
+.stepper .val { flex: 1; text-align: center; font-family: var(--font-mono); font-size: 52px; color: var(--amber); font-variant-numeric: tabular-nums; }
 details.rules summary { cursor: pointer; font-weight: 700; min-height: 56px; display: flex; align-items: center; }
-details.rules ol { margin: 8px 0 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 8px; }
+details.rules ol { margin: 8px 0 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 10px; font-size: 24px; color: var(--muted); }
+.error { color: var(--red); font-weight: 700; font-size: 24px; }
 
-/* Pass / question */
-.pass-hero { text-align: center; display: flex; flex-direction: column; gap: 16px; align-items: center; padding-top: 6vh; }
-.pass-hero .who {
-  font-family: var(--font-display); font-size: clamp(48px, 13vw, 76px); line-height: 1.1;
-  color: var(--sage); overflow-wrap: anywhere;
+/* Pass */
+.pass { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; padding-top: 3vh; }
+.rings { width: 148px; height: 148px; border-radius: 50%; display: grid; place-items: center; border: 2px solid rgba(31,227,208,.2); margin-bottom: 10px; }
+.rings > div {
+  width: 104px; height: 104px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--teal-dim); border: 2px solid rgba(31,227,208,.55); color: var(--teal);
 }
-.phone-icon { width: 96px; height: 96px; }
-.breathe { animation: breathe 3.5s ease-in-out infinite; }
-.question {
-  font-family: var(--font-display);
-  font-size: clamp(34px, 8vw, 50px);
-  line-height: 1.25;
-  text-wrap: balance;
-  overflow-wrap: break-word;
-}
-.progress { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-.progress span { width: 18px; height: 18px; border-radius: 50%; background: var(--line); }
-.progress span.done { background: var(--sage); }
-.progress span.now { background: var(--honey-ink); }
+.glow { animation: glow 3s ease-in-out infinite; }
+.rings svg { width: 46px; height: 46px; }
+.who { font-family: var(--font-display); font-weight: 800; font-size: clamp(54px, 15vw, 84px); line-height: 1.05; overflow-wrap: anywhere; text-shadow: 0 0 30px rgba(255,255,255,.18); }
+.divider { width: 64px; height: 3px; border-radius: 2px; background: var(--teal); opacity: .5; margin: 6px auto; }
+.turns { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 18px; }
+.turn { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 64px; font-family: var(--font-mono); font-size: 24px; color: var(--muted); }
+.turn i { width: 22px; height: 22px; border-radius: 50%; background: var(--line); display: block; }
+.turn.done i { background: var(--teal-deep); opacity: .6; }
+.turn.now { color: var(--teal); }
+.turn.now i { background: var(--teal); box-shadow: 0 0 0 5px var(--teal-dim), 0 0 14px var(--teal); }
 
-.countdown { display: flex; justify-content: center; gap: 18px; }
-.countdown span {
-  width: 96px; height: 96px; border-radius: 50%;
-  display: grid; place-items: center;
-  font-family: var(--font-display); font-size: 52px;
-  background: var(--honey-soft); color: var(--honey-ink);
+/* Question */
+.role { border-radius: 22px; padding: 20px 22px; display: flex; flex-direction: column; gap: 6px; text-align: center; }
+.role.same { background: var(--teal-dim); border: 2px solid rgba(31,227,208,.5); color: var(--teal); font-weight: 700; }
+.role.odd { background: #160B0D; border: 3px solid var(--red); animation: alarm 2.2s ease-in-out infinite; }
+.role.odd svg { width: 64px; height: 64px; margin: 0 auto; }
+.role.odd .big { font-family: var(--font-display); font-weight: 800; font-size: clamp(36px, 9.5vw, 52px); line-height: 1.1; color: var(--red); text-transform: uppercase; text-shadow: 0 0 18px rgba(255,75,75,.55); }
+.role.odd p { font-weight: 700; }
+.question { font-family: var(--font-display); font-weight: 700; font-size: clamp(32px, 8vw, 46px); line-height: 1.25; text-wrap: balance; overflow-wrap: break-word; }
+.hint { color: var(--amber); font-weight: 700; }
+
+/* Answer countdown */
+.count { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.count .n {
+  width: 92px; height: 92px; border-radius: 50%; display: grid; place-items: center; flex: none;
+  font-family: var(--font-display); font-weight: 700; font-size: 44px;
+  color: rgba(31,227,208,.55); background: rgba(31,227,208,.06); border: 2px solid rgba(31,227,208,.25);
 }
-.countdown span:last-child { background: var(--sage); color: var(--on-sage); }
+.count .n.go { width: 112px; height: 112px; font-size: 56px; color: var(--text); background: rgba(31,227,208,.12); border: 3px solid var(--teal); }
+.count .dash { width: 22px; height: 3px; background: rgba(31,227,208,.35); border-radius: 2px; }
 
 /* Vote */
-.vote-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
-.vote-grid .btn { font-size: 32px; min-height: 100px; overflow-wrap: anywhere; }
+.vote-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+.vote {
+  appearance: none; cursor: pointer; min-height: 120px; border-radius: 20px; padding: 14px 10px;
+  background: var(--panel); border: 2px solid var(--line); color: var(--text);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  font-size: 28px; font-weight: 700; overflow-wrap: anywhere; text-align: center;
+}
+.vote .av {
+  width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--teal-dim); color: var(--teal); font-family: var(--font-mono); font-size: 24px;
+}
+.vote:active { border-color: var(--red); background: var(--red-dim); }
+.target-ring {
+  width: 200px; max-width: 100%; aspect-ratio: 1; border-radius: 50%; margin: 0 auto;
+  display: grid; place-items: center; padding: 16px; text-align: center;
+  border: 3px solid var(--red); background: var(--red-dim); box-shadow: 0 0 40px rgba(255,75,75,.3);
+  font-family: var(--font-display); font-weight: 800; font-size: clamp(32px, 9vw, 44px); overflow-wrap: anywhere; line-height: 1.1;
+}
+
+/* Reveal */
+.hero {
+  margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
+  margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px)));
+  margin-top: -20px;
+  padding: 34px max(16px, env(safe-area-inset-right, 0px)) 26px max(16px, env(safe-area-inset-left, 0px));
+  display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center;
+}
+.hero.escaped { background: linear-gradient(120deg, #C8283A, var(--orange)); }
+.hero.caught { background: linear-gradient(120deg, #0B8F86, var(--teal)); color: var(--teal-ink); }
+.hero.win { background: linear-gradient(120deg, #B8801A, var(--amber)); color: #1E1405; }
+.hero svg { width: 56px; height: 56px; }
+.hero h1, .hero h2 { text-transform: uppercase; }
+.hero p { font-size: 24px; opacity: .92; }
+@media (min-width: 712px) { .hero { margin-left: 0; margin-right: 0; border-radius: 0 0 28px 28px; } }
+.strip {
+  display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;
+  background: var(--panel); border: 2px solid var(--line); border-radius: 18px; padding: 14px 18px; color: var(--muted); text-align: center;
+}
+.strip svg { width: 28px; height: 28px; flex: none; }
+.qcards { display: grid; grid-template-columns: 1fr; gap: 14px; }
+@media (min-width: 600px) { .qcards { grid-template-columns: 1fr 1fr; } }
+.qcard {
+  background: var(--panel); border: 2px solid var(--line); border-top: 5px solid var(--teal);
+  border-radius: 20px; padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; min-width: 0;
+}
+.qcard.odd { border-top-color: var(--red); }
+.qcard .label { color: var(--teal); display: flex; align-items: center; gap: 10px; }
+.qcard.odd .label { color: var(--red); }
+.qcard .qi { width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center; background: var(--teal-dim); color: var(--teal); }
+.qcard.odd .qi { background: var(--red-dim); color: var(--red); }
+.qcard .qi svg { width: 28px; height: 28px; }
+.qcard .qtext { font-weight: 700; font-size: 28px; line-height: 1.3; }
+.qcard .who-list { font-size: 24px; color: var(--muted); }
+.qcard.odd .who-list { color: #FF8A8A; }
+.callout { background: var(--amber-dim); border: 2px solid rgba(244,182,63,.45); border-radius: 20px; padding: 20px; font-weight: 700; }
+.points { display: flex; flex-direction: column; gap: 8px; }
+.points p { display: flex; gap: 12px; align-items: baseline; }
+.points .plus { font-family: var(--font-mono); color: var(--amber); }
 
 /* Scores */
-.scores { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.scores { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
 .scores li {
-  display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 14px;
-  background: var(--surface); border: 2px solid var(--line); border-radius: 18px;
-  padding: 14px 20px; min-height: 80px;
+  display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 8px 14px;
+  background: var(--panel); border: 2px solid var(--line); border-radius: 18px; padding: 14px 18px;
 }
-.scores li.lead { border-color: var(--honey-ink); background: var(--honey-soft); }
+.scores li.lead { border-color: var(--amber); background: linear-gradient(90deg, var(--amber-dim), var(--panel)); }
+.scores .rank { font-family: var(--font-mono); font-size: 24px; color: var(--muted); min-width: 1.4em; }
+.scores li.lead .rank { color: var(--amber); }
 .scores .sname { font-size: 28px; font-weight: 700; min-width: 0; overflow-wrap: anywhere; }
-.scores .gain {
-  font-size: 24px; font-weight: 700; color: var(--sage);
-  background: var(--sage-soft); border-radius: 12px; padding: 2px 12px;
-}
+.scores .gain { font-family: var(--font-mono); font-size: 24px; color: var(--teal); background: var(--teal-dim); border-radius: 10px; padding: 2px 10px; }
 .scores .gain.none { visibility: hidden; }
-.scores .pts { font-family: var(--font-display); font-size: 40px; font-variant-numeric: tabular-nums; min-width: 1.6em; text-align: right; }
-.bar { height: 14px; border-radius: 7px; background: var(--line); overflow: hidden; grid-column: 1 / -1; }
-.bar i { display: block; height: 100%; background: var(--sage); border-radius: 7px; transition: width .8s ease; }
-
-.verdict { text-align: center; display: flex; flex-direction: column; gap: 12px; align-items: center; }
-.verdict .badge {
-  width: 110px; height: 110px; border-radius: 50%; display: grid; place-items: center;
-}
-.verdict .badge svg { width: 64px; height: 64px; }
-.verdict.win .badge { background: var(--sage-soft); color: var(--sage); }
-.verdict.lose .badge { background: var(--rose-soft); color: var(--rose-ink); }
-.oddname { font-family: var(--font-display); font-size: clamp(40px, 10vw, 58px); color: var(--sage); overflow-wrap: anywhere; }
-.qtext { font-family: var(--font-display); font-size: clamp(28px, 6.5vw, 38px); line-height: 1.3; }
-.points-line { font-size: 26px; font-weight: 700; }
-/* Role banner above the question: black and red alarm for the Odd One, calm green for the group. */
-.role { border-radius: 26px; padding: 22px 24px; display: flex; flex-direction: column; gap: 6px; text-align: center; }
-.role.same { background: var(--sage-soft); border: 3px solid #C3D8CC; color: var(--sage); font-size: 26px; font-weight: 700; }
-.role.odd { background: var(--night); border: 4px solid var(--alarm); color: #FFFFFF; animation: alarm 2.2s ease-in-out infinite; }
-.role.odd .big {
-  font-family: var(--font-display); font-size: clamp(38px, 10vw, 56px); line-height: 1.1;
-  color: var(--alarm); text-transform: uppercase; letter-spacing: .03em; text-shadow: 0 0 18px rgba(255, 59, 48, .55);
-}
-.role.odd p { font-size: 26px; font-weight: 700; }
-.role.odd svg { width: 64px; height: 64px; margin: 0 auto; }
-@keyframes alarm {
-  0%,100% { box-shadow: 0 0 0 0 rgba(255, 59, 48, .0); }
-  50% { box-shadow: 0 0 28px 6px rgba(255, 59, 48, .55); }
-}
-@media (prefers-reduced-motion: reduce) { .role.odd { animation: none; } }
-.hint { font-size: 28px; font-weight: 700; color: var(--sage); }
+.scores .pts { font-family: var(--font-mono); font-size: 38px; text-align: right; min-width: 1.6em; font-variant-numeric: tabular-nums; }
+.bar { grid-column: 1 / -1; height: 10px; border-radius: 5px; background: #222C3B; overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: 5px; background: linear-gradient(90deg, var(--teal-deep), var(--teal)); transition: width .8s ease; }
+.scores li.lead .bar i { background: var(--amber); }
 </style>
 </head>
 <body>
@@ -273,99 +300,6 @@ details.rules ol { margin: 8px 0 0; padding-left: 1.3em; display: flex; flex-dir
 /* ---------- Question pairs: [normal, odd] in English and French.
    Both questions of a pair share an answer type, so the hint never gives the Odd One away. ---------- */
 var PAIRS = [
-  { en: ["How many cups of tea or coffee do you drink in a day?", "How many biscuits could you eat with one cup of tea?"],
-    fr: ["Combien de tasses de thé ou de café buvez-vous par jour ?", "Combien de biscuits pourriez-vous manger avec une tasse de thé ?"] },
-  { en: ["At what age did you learn to ride a bicycle?", "At what age did you first go to the cinema?"],
-    fr: ["À quel âge avez-vous appris à faire du vélo ?", "À quel âge avez-vous vu votre premier film au cinéma ?"] },
-  { en: ["How many hours of sleep do you need to feel good?", "How many hours should a perfect Sunday lunch last?"],
-    fr: ["De combien d'heures de sommeil avez-vous besoin pour être en forme ?", "Combien d'heures devrait durer un déjeuner du dimanche parfait ?"] },
-  { en: ["How many countries have you visited?", "How many different homes have you lived in?"],
-    fr: ["Combien de pays avez-vous visités ?", "Dans combien de logements différents avez-vous vécu ?"] },
-  { en: ["How many pets have you had in your life?", "How many of your school teachers can you still name?"],
-    fr: ["Combien d'animaux de compagnie avez-vous eus dans votre vie ?", "Combien de vos instituteurs pouvez-vous encore nommer ?"] },
-  { en: ["How many children make the perfect family?", "How many people make the perfect dinner table?"],
-    fr: ["Combien d'enfants font une famille parfaite ?", "Combien de personnes font une tablée parfaite ?"] },
-  { en: ["What is the perfect temperature for a summer day, in degrees Celsius?", "What is the perfect temperature for a bath, in degrees Celsius?"],
-    fr: ["Quelle est la température parfaite pour une journée d'été, en degrés ?", "Quelle est la température parfaite pour un bain, en degrés ?"] },
-  { en: ["How many minutes should a perfect boiled egg cook?", "How many minutes do you need to get dressed in the morning?"],
-    fr: ["Combien de minutes doit cuire un œuf à la coque parfait ?", "Combien de minutes vous faut-il pour vous habiller le matin ?"] },
-  { en: ["At what age did you start your first job?", "At what age did you go to your first dance?"],
-    fr: ["À quel âge avez-vous commencé votre premier travail ?", "À quel âge avez-vous dansé à votre premier bal ?"] },
-  { en: ["How many songs can you sing all the way through by heart?", "How many recipes can you cook without a cookbook?"],
-    fr: ["Combien de chansons pouvez-vous chanter par cœur en entier ?", "Combien de recettes savez-vous cuisiner sans livre de cuisine ?"] },
-  { en: ["How many times have you moved house?", "How many times have you been on an aeroplane?"],
-    fr: ["Combien de fois avez-vous déménagé ?", "Combien de fois avez-vous pris l'avion ?"] },
-  { en: ["How many hours a week do you watch television?", "How many hours a week do you spend in the kitchen?"],
-    fr: ["Combien d'heures par semaine regardez-vous la télévision ?", "Combien d'heures par semaine passez-vous dans la cuisine ?"] },
-  { en: ["How many postcards or letters do you send in a year?", "How many birthday cards do you receive in a year?"],
-    fr: ["Combien de cartes postales ou de lettres envoyez-vous par an ?", "Combien de cartes d'anniversaire recevez-vous par an ?"] },
-  { en: ["What is the best age to be?", "At what age did you first feel like a grown-up?"],
-    fr: ["Quel est le meilleur âge de la vie ?", "À quel âge avez-vous eu l'impression d'être adulte ?"] },
-  { en: ["How many slices of cake is too many at a party?", "How many cups of tea is too many in one afternoon?"],
-    fr: ["À partir de combien de parts de gâteau est-ce trop lors d'une fête ?", "À partir de combien de tasses de thé est-ce trop en un après-midi ?"] },
-  { en: ["How many minutes is a nice walk after dinner?", "How many minutes do you like to spend reading the newspaper?"],
-    fr: ["Combien de minutes dure une belle promenade après le repas ?", "Combien de minutes aimez-vous passer à lire le journal ?"] },
-  { en: ["How many keys are on your key ring?", "How many pairs of shoes do you own?"],
-    fr: ["Combien de clés y a-t-il sur votre trousseau ?", "Combien de paires de chaussures avez-vous ?"] },
-  { en: ["How many guests make a perfect party?", "How many candles should a birthday cake have, at most?"],
-    fr: ["Combien d'invités font une fête parfaite ?", "Combien de bougies un gâteau d'anniversaire devrait-il avoir, au maximum ?"] },
-  { en: ["How many times a week do you eat cheese?", "How many times a week do you telephone a friend?"],
-    fr: ["Combien de fois par semaine mangez-vous du fromage ?", "Combien de fois par semaine téléphonez-vous à un ami ?"] },
-  { en: ["From 1 to 10, how much do you enjoy gardening?", "From 1 to 10, how good are you at keeping a secret?"],
-    fr: ["De 1 à 10, à quel point aimez-vous jardiner ?", "De 1 à 10, à quel point savez-vous garder un secret ?"] },
-  { en: ["From 1 to 10, how much do you love chocolate?", "From 1 to 10, how much do you enjoy rainy days?"],
-    fr: ["De 1 à 10, à quel point aimez-vous le chocolat ?", "De 1 à 10, à quel point aimez-vous les jours de pluie ?"] },
-  { en: ["From 1 to 10, how good a cook are you?", "From 1 to 10, how good a dancer are you?"],
-    fr: ["De 1 à 10, quel bon cuisinier êtes-vous ?", "De 1 à 10, quel bon danseur êtes-vous ?"] },
-  { en: ["From 1 to 10, how scary are spiders?", "From 1 to 10, how scary is a visit to the dentist?"],
-    fr: ["De 1 à 10, à quel point les araignées vous font-elles peur ?", "De 1 à 10, à quel point le dentiste vous fait-il peur ?"] },
-  { en: ["How many spoons of sugar do you take in your tea?", "How many pillows do you sleep with?"],
-    fr: ["Combien de cuillères de sucre mettez-vous dans votre thé ?", "Avec combien d'oreillers dormez-vous ?"] },
-  { en: ["At what age did you first watch television?", "At what age did you first use a telephone?"],
-    fr: ["À quel âge avez-vous regardé la télévision pour la première fois ?", "À quel âge avez-vous utilisé un téléphone pour la première fois ?"] },
-  { en: ["How many cousins do you have?", "How many of your neighbours do you know by name?"],
-    fr: ["Combien de cousins et cousines avez-vous ?", "Combien de vos voisins connaissez-vous par leur nom ?"] },
-  { en: ["How many photos hang on the walls of your home?", "How many plants do you have in your home?"],
-    fr: ["Combien de photos sont accrochées aux murs chez vous ?", "Combien de plantes avez-vous chez vous ?"] },
-  { en: ["How many hours long is a comfortable car journey?", "How many hours long is a good film?"],
-    fr: ["Combien d'heures dure un trajet en voiture agréable ?", "Combien d'heures dure un bon film ?"] },
-  { en: ["How many books do you read in a year?", "How many times a year do you eat at a restaurant?"],
-    fr: ["Combien de livres lisez-vous par an ?", "Combien de fois par an mangez-vous au restaurant ?"] },
-  { en: ["How many eggs make a perfect omelette?", "How many potatoes do you eat in a week?"],
-    fr: ["Combien d'œufs faut-il pour une omelette parfaite ?", "Combien de pommes de terre mangez-vous par semaine ?"] },
-  { en: ["How many minutes does it take to walk from your home to the nearest shop?", "How many minutes a day do you spend on the telephone?"],
-    fr: ["Combien de minutes faut-il pour aller à pied de chez vous au magasin le plus proche ?", "Combien de minutes par jour passez-vous au téléphone ?"] },
-  { en: ["At what age did you lose your first tooth?", "At what age did you learn to swim?"],
-    fr: ["À quel âge avez-vous perdu votre première dent ?", "À quel âge avez-vous appris à nager ?"] },
-  { en: ["In how many languages can you say “hello”?", "How many card games do you know how to play?"],
-    fr: ["Dans combien de langues savez-vous dire « bonjour » ?", "À combien de jeux de cartes savez-vous jouer ?"] },
-  { en: ["How many times have you seen the sea this year?", "How many times have you eaten ice cream this year?"],
-    fr: ["Combien de fois avez-vous vu la mer cette année ?", "Combien de fois avez-vous mangé une glace cette année ?"] },
-  { en: ["How many umbrellas do you own?", "How many coats hang in your hallway?"],
-    fr: ["Combien de parapluies avez-vous ?", "Combien de manteaux sont accrochés dans votre entrée ?"] },
-  { en: ["How many days could you go without chocolate?", "How many days could you go without watching television?"],
-    fr: ["Combien de jours pourriez-vous tenir sans chocolat ?", "Combien de jours pourriez-vous tenir sans regarder la télévision ?"] },
-  { en: ["At what hour do you usually wake up in the morning?", "At what hour did you go to bed when you were a child?"],
-    fr: ["À quelle heure vous réveillez-vous d'habitude le matin ?", "À quelle heure alliez-vous au lit quand vous étiez enfant ?"] },
-  { en: ["How many clocks are there in your home?", "How many mirrors are there in your home?"],
-    fr: ["Combien d'horloges et de pendules y a-t-il chez vous ?", "Combien de miroirs y a-t-il chez vous ?"] },
-  { en: ["How many times a day do you check the weather?", "How many times a day do you look out of the window?"],
-    fr: ["Combien de fois par jour regardez-vous la météo ?", "Combien de fois par jour regardez-vous par la fenêtre ?"] },
-  { en: ["How many school friends are you still in touch with?", "How many people on your street do you chat with?"],
-    fr: ["Avec combien d'amis d'école êtes-vous encore en contact ?", "Avec combien de personnes de votre rue discutez-vous ?"] },
-  { en: ["How many spoonfuls of jam go on a perfect slice of toast?", "How many slices of bread do you eat in a day?"],
-    fr: ["Combien de cuillerées de confiture faut-il sur une tartine parfaite ?", "Combien de tranches de pain mangez-vous par jour ?"] },
-  { en: ["How many minutes should a good afternoon nap last?", "How many minutes should a good hot bath last?"],
-    fr: ["Combien de minutes devrait durer une bonne sieste ?", "Combien de minutes devrait durer un bon bain chaud ?"] },
-  { en: ["How many musical instruments have you tried to play?", "How many different sports have you tried in your life?"],
-    fr: ["De combien d'instruments de musique avez-vous essayé de jouer ?", "Combien de sports différents avez-vous essayés dans votre vie ?"] },
-  { en: ["How many scoops of ice cream make the perfect dessert?", "How many lumps of sugar make the perfect cup of coffee?"],
-    fr: ["Combien de boules de glace font le dessert parfait ?", "Combien de morceaux de sucre font le café parfait ?"] },
-  { en: ["How many jumpers do you own?", "How many hats do you own?"],
-    fr: ["Combien de pulls avez-vous ?", "Combien de chapeaux avez-vous ?"] },
-  { en: ["How many grandchildren or godchildren would you love to have?", "How many board games do you have at home?"],
-    fr: ["Combien de petits-enfants ou de filleuls aimeriez-vous avoir ?", "Combien de jeux de société avez-vous à la maison ?"] },
-
   /* Answer is a food or drink */
   { type: "food",
     en: ["What is the best food to take on a picnic?", "What food would you take to a desert island?"],
@@ -385,6 +319,27 @@ var PAIRS = [
   { type: "food",
     en: ["Which fruit do you eat most often?", "Which fruit makes the best jam?"],
     fr: ["Quel fruit mangez-vous le plus souvent ?", "Quel fruit fait la meilleure confiture ?"] },
+  { type: "food",
+    en: ["What do you like to put on your toast?", "What do you like to put on a pancake?"],
+    fr: ["Que mettez-vous sur vos tartines ?", "Que mettez-vous sur une crêpe ?"] },
+  { type: "food",
+    en: ["What is the best pizza topping?", "What would you put in a sandwich?"],
+    fr: ["Quelle est la meilleure garniture de pizza ?", "Que mettriez-vous dans un sandwich ?"] },
+  { type: "food",
+    en: ["What snack would you eat at the cinema?", "What snack would you take on a long train journey?"],
+    fr: ["Que grignoteriez-vous au cinéma ?", "Quel en-cas emporteriez-vous pour un long voyage en train ?"] },
+  { type: "food",
+    en: ["What would you cook on a cold winter evening?", "What soup do you like best?"],
+    fr: ["Que cuisineriez-vous par une froide soirée d'hiver ?", "Quelle soupe préférez-vous ?"] },
+  { type: "food",
+    en: ["What is your favourite ice cream flavour?", "What is your favourite cake flavour?"],
+    fr: ["Quel est votre parfum de glace préféré ?", "Quel est votre parfum de gâteau préféré ?"] },
+  { type: "food",
+    en: ["What is the best thing to eat for breakfast?", "What would you eat after a long walk?"],
+    fr: ["Quelle est la meilleure chose à manger au petit déjeuner ?", "Que mangeriez-vous après une longue promenade ?"] },
+  { type: "food",
+    en: ["What food smells the best while it is cooking?", "What would you put on a barbecue?"],
+    fr: ["Quel plat sent le meilleur pendant la cuisson ?", "Que mettriez-vous sur un barbecue ?"] },
 
   /* Answer is a place */
   { type: "place",
@@ -402,17 +357,21 @@ var PAIRS = [
   { type: "place",
     en: ["Which room in your home do you like the most?", "Where in your home do you usually lose your glasses?"],
     fr: ["Quelle pièce de votre maison préférez-vous ?", "Où perdez-vous le plus souvent vos lunettes chez vous ?"] },
-
-  /* Answer is a colour */
-  { type: "colour",
-    en: ["What is your favourite colour?", "What colour should a front door be?"],
-    fr: ["Quelle est votre couleur préférée ?", "De quelle couleur devrait être une porte d'entrée ?"] },
-  { type: "colour",
-    en: ["What is the best colour for a car?", "What colour would you paint your bedroom?"],
-    fr: ["Quelle est la meilleure couleur pour une voiture ?", "De quelle couleur peindriez-vous votre chambre ?"] },
-  { type: "colour",
-    en: ["What colour reminds you of summer?", "What colour are your favourite flowers?"],
-    fr: ["Quelle couleur vous fait penser à l'été ?", "De quelle couleur sont vos fleurs préférées ?"] },
+  { type: "place",
+    en: ["Where would you go on a first date?", "Where would you take a friend visiting your town?"],
+    fr: ["Où iriez-vous pour un premier rendez-vous ?", "Où emmèneriez-vous un ami en visite dans votre ville ?"] },
+  { type: "place",
+    en: ["Where would you hide treasure in your home?", "Where do you keep your important papers?"],
+    fr: ["Où cacheriez-vous un trésor chez vous ?", "Où rangez-vous vos papiers importants ?"] },
+  { type: "place",
+    en: ["Where is the best place to watch the sunset?", "Where would you like to spend Christmas?"],
+    fr: ["Quel est le meilleur endroit pour regarder le coucher du soleil ?", "Où aimeriez-vous passer Noël ?"] },
+  { type: "place",
+    en: ["Which shop could you spend hours in?", "Where do you go to relax?"],
+    fr: ["Dans quel magasin pourriez-vous passer des heures ?", "Où allez-vous pour vous détendre ?"] },
+  { type: "place",
+    en: ["Which famous monument would you most like to see?", "Which place would you put on a postcard?"],
+    fr: ["Quel monument célèbre aimeriez-vous le plus voir ?", "Quel lieu mettriez-vous sur une carte postale ?"] },
 
   /* Answer is an animal */
   { type: "animal",
@@ -427,8 +386,83 @@ var PAIRS = [
   { type: "animal",
     en: ["Which animal are you most afraid of?", "Which animal would you never want in your house?"],
     fr: ["De quel animal avez-vous le plus peur ?", "Quel animal ne voudriez-vous jamais chez vous ?"] },
+  { type: "animal",
+    en: ["Which animal is the funniest?", "Which animal would make a good cartoon character?"],
+    fr: ["Quel animal est le plus drôle ?", "Quel animal ferait un bon personnage de dessin animé ?"] },
+  { type: "animal",
+    en: ["Which animal would you like to be for a day?", "Which animal would you like to ride?"],
+    fr: ["Quel animal aimeriez-vous être pendant une journée ?", "Sur quel animal aimeriez-vous monter ?"] },
+  { type: "animal",
+    en: ["Which animal is the noisiest?", "Which animal would wake you up in the morning?"],
+    fr: ["Quel animal est le plus bruyant ?", "Quel animal vous réveillerait le matin ?"] },
+  { type: "animal",
+    en: ["Which animal would you draw for a child?", "Which animal would you find on a farm?"],
+    fr: ["Quel animal dessineriez-vous pour un enfant ?", "Quel animal trouve-t-on dans une ferme ?"] },
 
-  /* Answer is someone in the room: everyone points */
+  /* Answer is an object */
+  { type: "thing",
+    en: ["What object would you take to a desert island?", "What object at home could you not live without?"],
+    fr: ["Quel objet emporteriez-vous sur une île déserte ?", "Sans quel objet de la maison ne pourriez-vous pas vivre ?"] },
+  { type: "thing",
+    en: ["What was your favourite toy as a child?", "What is the perfect present for a child?"],
+    fr: ["Quel était votre jouet préféré quand vous étiez enfant ?", "Quel est le cadeau parfait pour un enfant ?"] },
+  { type: "thing",
+    en: ["What is the most useful thing in a kitchen?", "Which kitchen tool do you use the most?"],
+    fr: ["Quel est l'objet le plus utile dans une cuisine ?", "Quel ustensile de cuisine utilisez-vous le plus ?"] },
+  { type: "thing",
+    en: ["What is the best present you have ever received?", "What would you buy if you won a small prize?"],
+    fr: ["Quel est le plus beau cadeau que vous ayez reçu ?", "Qu'achèteriez-vous si vous gagniez un petit lot ?"] },
+  { type: "thing",
+    en: ["What would you take on a beach holiday?", "What would you pack for a weekend away?"],
+    fr: ["Qu'emporteriez-vous pour des vacances à la plage ?", "Que mettriez-vous dans votre valise pour un week-end ?"] },
+  { type: "thing",
+    en: ["What is always in your bag or your pockets?", "What do you check before leaving the house?"],
+    fr: ["Qu'y a-t-il toujours dans votre sac ou vos poches ?", "Que vérifiez-vous avant de quitter la maison ?"] },
+  { type: "thing",
+    en: ["What would you find in a grandmother's attic?", "What would you buy at a flea market?"],
+    fr: ["Que trouverait-on dans le grenier d'une grand-mère ?", "Qu'achèteriez-vous dans une brocante ?"] },
+  { type: "thing",
+    en: ["What would you put in a time capsule?", "What would you keep in a box of memories?"],
+    fr: ["Que mettriez-vous dans une capsule temporelle ?", "Que garderiez-vous dans une boîte à souvenirs ?"] },
+  { type: "thing",
+    en: ["What would you give as a present for a new baby?", "What would you bring to a friend in hospital?"],
+    fr: ["Qu'offririez-vous pour la naissance d'un bébé ?", "Qu'apporteriez-vous à un ami à l'hôpital ?"] },
+  { type: "thing",
+    en: ["What would you take camping?", "What would you need during a power cut?"],
+    fr: ["Qu'emporteriez-vous en camping ?", "De quoi auriez-vous besoin pendant une coupure de courant ?"] },
+  { type: "thing",
+    en: ["Which musical instrument sounds the nicest?", "Which musical instrument would you like to learn?"],
+    fr: ["Quel instrument de musique a le plus beau son ?", "De quel instrument aimeriez-vous apprendre à jouer ?"] },
+
+  /* Answer is something to wear */
+  { type: "clothes",
+    en: ["What would you wear to a wedding?", "What would you wear to the theatre?"],
+    fr: ["Que porteriez-vous pour un mariage ?", "Que porteriez-vous pour aller au théâtre ?"] },
+  { type: "clothes",
+    en: ["What do you wear when it rains?", "What would you wear for a walk in the mountains?"],
+    fr: ["Que portez-vous quand il pleut ?", "Que porteriez-vous pour une randonnée en montagne ?"] },
+  { type: "clothes",
+    en: ["What is the most comfortable thing to wear at home?", "What would you wear on a lazy Sunday?"],
+    fr: ["Quel est le vêtement le plus confortable à la maison ?", "Que porteriez-vous un dimanche tranquille ?"] },
+
+  /* Answer is a colour */
+  { type: "colour",
+    en: ["What is your favourite colour?", "What colour should a front door be?"],
+    fr: ["Quelle est votre couleur préférée ?", "De quelle couleur devrait être une porte d'entrée ?"] },
+  { type: "colour",
+    en: ["What is the best colour for a car?", "What colour would you paint your bedroom?"],
+    fr: ["Quelle est la meilleure couleur pour une voiture ?", "De quelle couleur peindriez-vous votre chambre ?"] },
+  { type: "colour",
+    en: ["What colour reminds you of summer?", "What colour are your favourite flowers?"],
+    fr: ["Quelle couleur vous fait penser à l'été ?", "De quelle couleur sont vos fleurs préférées ?"] },
+  { type: "colour",
+    en: ["What colour would you wear to a party?", "What colour is a happy colour?"],
+    fr: ["Quelle couleur porteriez-vous à une fête ?", "Quelle couleur est une couleur joyeuse ?"] },
+  { type: "colour",
+    en: ["What colour would you choose for an umbrella?", "What colour would you choose for a winter coat?"],
+    fr: ["Quelle couleur choisiriez-vous pour un parapluie ?", "Quelle couleur choisiriez-vous pour un manteau d'hiver ?"] },
+
+  /* Answer is someone in the room (everyone points) */
   { type: "person",
     en: ["Who here is best at keeping a secret?", "Who here would make the best judge?"],
     fr: ["Qui, ici, sait le mieux garder un secret ?", "Qui, ici, ferait le meilleur juge ?"] },
@@ -450,8 +484,23 @@ var PAIRS = [
   { type: "person",
     en: ["Who here has the best laugh?", "Who here always cheers you up?"],
     fr: ["Qui, ici, a le plus beau rire ?", "Qui, ici, vous remonte toujours le moral ?"] },
+  { type: "person",
+    en: ["Who here would make the best spy?", "Who here would be best at hide and seek?"],
+    fr: ["Qui, ici, ferait le meilleur espion ?", "Qui, ici, serait le meilleur à cache-cache ?"] },
+  { type: "person",
+    en: ["Who here would win a talent show?", "Who here would make a good actor?"],
+    fr: ["Qui, ici, gagnerait un concours de talents ?", "Qui, ici, ferait un bon acteur ?"] },
+  { type: "person",
+    en: ["Who here gives the best advice?", "Who here would you call if you were lost?"],
+    fr: ["Qui, ici, donne les meilleurs conseils ?", "Qui, ici, appelleriez-vous si vous étiez perdu ?"] },
+  { type: "person",
+    en: ["Who here would eat the last biscuit?", "Who here has the biggest sweet tooth?"],
+    fr: ["Qui, ici, mangerait le dernier biscuit ?", "Qui, ici, est le plus gourmand ?"] },
+  { type: "person",
+    en: ["Who here is the most organised?", "Who here would plan the best holiday?"],
+    fr: ["Qui, ici, est le plus organisé ?", "Qui, ici, organiserait les meilleures vacances ?"] },
 
-  /* Answer is a famous person */
+  /* Answer is a famous person or character */
   { type: "famous",
     en: ["Which singer would you most like to see in concert?", "Which famous person would you invite to dinner?"],
     fr: ["Quel chanteur ou quelle chanteuse aimeriez-vous voir en concert ?", "Quelle personne célèbre inviteriez-vous à dîner ?"] },
@@ -461,37 +510,82 @@ var PAIRS = [
   { type: "famous",
     en: ["Who should play you in a film about your life?", "Which famous person do people say you look like?"],
     fr: ["Qui devrait jouer votre rôle dans un film sur votre vie ?", "À quelle personne célèbre dit-on que vous ressemblez ?"] },
+  { type: "famous",
+    en: ["Which famous person would you like to be for a day?", "Which famous person would you like as a neighbour?"],
+    fr: ["Quelle personne célèbre aimeriez-vous être pendant une journée ?", "Quelle personne célèbre aimeriez-vous avoir comme voisin ?"] },
+  { type: "famous",
+    en: ["Which cartoon character is your favourite?", "Which cartoon character would you take on holiday?"],
+    fr: ["Quel personnage de dessin animé préférez-vous ?", "Quel personnage de dessin animé emmèneriez-vous en vacances ?"] },
 
-  /* Answer is an object */
-  { type: "thing",
-    en: ["What object would you take to a desert island?", "What object at home could you not live without?"],
-    fr: ["Quel objet emporteriez-vous sur une île déserte ?", "Sans quel objet de la maison ne pourriez-vous pas vivre ?"] },
-  { type: "thing",
-    en: ["What was your favourite toy as a child?", "What is the perfect present for a child?"],
-    fr: ["Quel était votre jouet préféré quand vous étiez enfant ?", "Quel est le cadeau parfait pour un enfant ?"] },
-  { type: "thing",
-    en: ["What is the most useful thing in a kitchen?", "Which kitchen tool do you use the most?"],
-    fr: ["Quel est l'objet le plus utile dans une cuisine ?", "Quel ustensile de cuisine utilisez-vous le plus ?"] },
-  { type: "thing",
-    en: ["What is the best present you have ever received?", "What would you buy if you won a small prize?"],
-    fr: ["Quel est le plus beau cadeau que vous ayez reçu ?", "Qu'achèteriez-vous si vous gagniez un petit lot ?"] },
+  /* Answer is a film or TV programme */
+  { type: "film",
+    en: ["Which film could you watch again and again?", "Which film would you watch at Christmas?"],
+    fr: ["Quel film pourriez-vous regarder encore et encore ?", "Quel film regarderiez-vous à Noël ?"] },
+  { type: "film",
+    en: ["Which TV programme did you love when you were younger?", "Which TV programme would you watch with your grandchildren?"],
+    fr: ["Quelle émission de télévision adoriez-vous plus jeune ?", "Quelle émission regarderiez-vous avec vos petits-enfants ?"] },
 
-  /* Answer is a season, a day, a hobby or a sport */
-  { type: "season",
-    en: ["What is the best season of the year?", "In which season do you feel the most energetic?"],
-    fr: ["Quelle est la plus belle saison de l'année ?", "En quelle saison vous sentez-vous le plus en forme ?"] },
-  { type: "day",
-    en: ["Which day of the week is your favourite?", "Which day of the week is best for a family meal?"],
-    fr: ["Quel est votre jour de la semaine préféré ?", "Quel jour de la semaine est idéal pour un repas de famille ?"] },
+  /* Answer is something to do */
   { type: "hobby",
     en: ["What is your favourite pastime?", "What would you do with a free afternoon?"],
     fr: ["Quel est votre passe-temps préféré ?", "Que feriez-vous d'un après-midi libre ?"] },
+  { type: "hobby",
+    en: ["What do you like to do on a rainy afternoon?", "What would you do on a long train journey?"],
+    fr: ["Qu'aimez-vous faire un après-midi de pluie ?", "Que feriez-vous pendant un long voyage en train ?"] },
+  { type: "hobby",
+    en: ["What do you like to do at the beach?", "What would you do on a sunny Sunday?"],
+    fr: ["Qu'aimez-vous faire à la plage ?", "Que feriez-vous un dimanche ensoleillé ?"] },
+  { type: "hobby",
+    en: ["What is the best part of a family party?", "What do you like doing at a wedding?"],
+    fr: ["Quel est le meilleur moment d'une fête de famille ?", "Qu'aimez-vous faire à un mariage ?"] },
+
+  /* Answer is a game */
+  { type: "game",
+    en: ["What game do you like to play with the family?", "What game would you play at a children's party?"],
+    fr: ["À quel jeu aimez-vous jouer en famille ?", "À quel jeu joueriez-vous à une fête d'enfants ?"] },
+  { type: "game",
+    en: ["What card or board game do you play the best?", "What game would you play on a rainy holiday?"],
+    fr: ["À quel jeu de cartes ou de société êtes-vous le meilleur ?", "À quel jeu joueriez-vous pendant des vacances pluvieuses ?"] },
+
+  /* Answer is a job */
+  { type: "job",
+    en: ["What job would you have liked to do?", "Which job looks the most fun on television?"],
+    fr: ["Quel métier auriez-vous aimé faire ?", "Quel métier a l'air le plus amusant à la télévision ?"] },
+  { type: "job",
+    en: ["Which job is the hardest?", "Which job would you never want to do?"],
+    fr: ["Quel est le métier le plus difficile ?", "Quel métier ne voudriez-vous jamais faire ?"] },
+
+  /* Answer is a word or expression */
+  { type: "word",
+    en: ["Which word describes you best?", "Which word would your friends use to describe you?"],
+    fr: ["Quel mot vous décrit le mieux ?", "Quel mot vos amis utiliseraient-ils pour vous décrire ?"] },
+  { type: "word",
+    en: ["What do you say when you are surprised?", "What would you shout at a football match?"],
+    fr: ["Que dites-vous quand vous êtes surpris ?", "Que crieriez-vous à un match de football ?"] },
+
+  /* Answer is a season */
+  { type: "season",
+    en: ["What is the best season of the year?", "In which season do you feel the most energetic?"],
+    fr: ["Quelle est la plus belle saison de l'année ?", "En quelle saison vous sentez-vous le plus en forme ?"] },
+
+  /* Answer is a day of the week */
+  { type: "day",
+    en: ["Which day of the week is your favourite?", "Which day of the week is best for a family meal?"],
+    fr: ["Quel est votre jour de la semaine préféré ?", "Quel jour de la semaine est idéal pour un repas de famille ?"] },
+
+  /* Answer is the weather */
+  { type: "weather",
+    en: ["What is the best weather for a walk?", "What weather do you hope for on holiday?"],
+    fr: ["Quel est le meilleur temps pour une promenade ?", "Quel temps espérez-vous en vacances ?"] },
+
+  /* Answer is a sport */
   { type: "sport",
     en: ["Which sport do you most like to watch?", "Which sport would you have liked to be good at?"],
-    fr: ["Quel sport aimez-vous le plus regarder ?", "Dans quel sport auriez-vous aimé être doué ?"] }
+    fr: ["Quel sport aimez-vous le plus regarder ?", "Dans quel sport auriez-vous aimé être doué ?"] },
+  { type: "sport",
+    en: ["Which sport is the hardest?", "Which sport would you watch at the Olympics?"],
+    fr: ["Quel sport est le plus difficile ?", "Quel sport regarderiez-vous aux Jeux olympiques ?"] }
 ];
-// Pairs without a type have a number as the answer.
-PAIRS.forEach(function (p) { if (!p.type) p.type = 'number'; });
 
 /* ---------- Interface text ---------- */
 var T = {
@@ -515,8 +609,8 @@ var T = {
     rules: [
       "Pass the phone around. Each person reads their question in secret.",
       "Everyone has the same question, except one person: the Odd One. The screen tells you if it's you.",
-      "Everyone says their answer on 3: a number, a place, a person…",
-      "Talk it over and vote: who had a different question?"
+      "Everyone says their answer on 3: a food, a place, a person…",
+      "Talk it over and vote: who had a different question? If caught, the Odd One can still win points by guessing the real question."
     ],
     round: "Round {n}",
     menu: "Menu",
@@ -525,7 +619,6 @@ var T = {
     show: "Show my question",
     yourQuestion: "Your question, {name}",
     hint: {
-      number: "Your answer is a number.",
       food: "Your answer is a food or a drink.",
       place: "Your answer is a place.",
       colour: "Your answer is a colour.",
@@ -536,7 +629,13 @@ var T = {
       season: "Your answer is a season.",
       day: "Your answer is a day of the week.",
       hobby: "Your answer is something you like to do.",
-      sport: "Your answer is a sport."
+      sport: "Your answer is a sport.",
+      clothes: "Your answer is something to wear.",
+      game: "Your answer is a game.",
+      job: "Your answer is a job.",
+      film: "Your answer is a film or a TV programme.",
+      word: "Your answer is a word or something you say.",
+      weather: "Your answer is a kind of weather."
     },
     keepSecret: "Think of it and keep it secret!",
     roleSame: "You have the group's question.",
@@ -605,8 +704,8 @@ var T = {
     rules: [
       "Faites passer le téléphone. Chacun lit sa question en secret.",
       "Tout le monde a la même question, sauf une personne : l'Intrus. L'écran vous dit si c'est vous.",
-      "Tout le monde dit sa réponse à 3 : un nombre, un lieu, une personne…",
-      "Discutez puis votez : qui avait une autre question ?"
+      "Tout le monde dit sa réponse à 3 : un aliment, un lieu, une personne…",
+      "Discutez puis votez : qui avait une autre question ? S'il est démasqué, l'Intrus peut encore gagner des points en devinant la vraie question."
     ],
     round: "Manche {n}",
     menu: "Menu",
@@ -615,7 +714,6 @@ var T = {
     show: "Voir ma question",
     yourQuestion: "Votre question, {name}",
     hint: {
-      number: "Votre réponse est un nombre.",
       food: "Votre réponse est un aliment ou une boisson.",
       place: "Votre réponse est un lieu.",
       colour: "Votre réponse est une couleur.",
@@ -626,7 +724,13 @@ var T = {
       season: "Votre réponse est une saison.",
       day: "Votre réponse est un jour de la semaine.",
       hobby: "Votre réponse est une activité que vous aimez.",
-      sport: "Votre réponse est un sport."
+      sport: "Votre réponse est un sport.",
+      clothes: "Votre réponse est un vêtement.",
+      game: "Votre réponse est un jeu.",
+      job: "Votre réponse est un métier.",
+      film: "Votre réponse est un film ou une émission.",
+      word: "Votre réponse est un mot ou une expression.",
+      weather: "Votre réponse est un type de temps."
     },
     keepSecret: "Pensez-y et gardez-la secrète !",
     roleSame: "Vous avez la question du groupe.",
@@ -794,37 +898,95 @@ function toScores() {
 
 function commit() { save(); render(); }
 
-/* ---------- Icons ---------- */
-var ICON_PHONE = '<svg class="phone-icon breathe" viewBox="0 0 96 96" aria-hidden="true"><circle cx="48" cy="48" r="46" fill="var(--honey-soft)"/><rect x="31" y="18" width="34" height="60" rx="7" fill="var(--surface)" stroke="var(--honey-ink)" stroke-width="4"/><circle cx="48" cy="68" r="3.5" fill="var(--honey-ink)"/><path d="M41 26h14" stroke="var(--honey-ink)" stroke-width="4" stroke-linecap="round"/></svg>';
-var ICON_EYE = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M4 32C14 16 50 16 60 32C50 48 14 48 4 32Z" fill="none" stroke="var(--alarm)" stroke-width="4" stroke-linejoin="round"/><circle cx="32" cy="32" r="10" fill="var(--alarm)"/><circle cx="32" cy="32" r="4" fill="var(--night)"/></svg>';
+function nextOrWin() {
+  var g = S.game, max = 0;
+  g.players.forEach(function (p) { max = Math.max(max, g.scores[p]); });
+  if (max >= S.target) { g.phase = 'winner'; commit(); }
+  else newRound();
+}
+
+/* ---------- Labels for the game-show layout ---------- */
+Object.assign(T.en, {
+  playerTurns: "Player turns · {i} of {n}",
+  suspicion: "Suspicion phase",
+  voting: "Voting phase",
+  standings: "Standings",
+  sayOn3a: "Everyone say your answer",
+  pointOn3a: "Everyone point at your answer",
+  on3: "on 3!",
+  heroEscapedSub: "The Odd One escaped detection.",
+  caughtStrip: "It was {name}!",
+  oddOnly: "{name} only",
+  roundPoints: "This round"
+});
+Object.assign(T.fr, {
+  playerTurns: "Tour des joueurs · {i} sur {n}",
+  suspicion: "Phase de soupçons",
+  voting: "Phase de vote",
+  standings: "Classement",
+  sayOn3a: "Tout le monde dit sa réponse",
+  pointOn3a: "Tout le monde montre sa réponse",
+  on3: "à 3 !",
+  heroEscapedSub: "L'Intrus n'a pas été démasqué.",
+  caughtStrip: "C'était bien {name} !",
+  oddOnly: "{name} seulement",
+  roundPoints: "Cette manche"
+});
+
+/* ---------- Icons (line icons, drawn in currentColor) ---------- */
+function icon(paths, extra) {
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"' + (extra || '') + '>' + paths + '</svg>';
+}
+var I = {
+  arrow: icon('<path d="M5 12h14M13 6l6 6-6 6"/>'),
+  star: icon('<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>'),
+  menu: icon('<path d="M4 7h16M4 12h16M10 17h10"/>'),
+  phone: icon('<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/>'),
+  x: icon('<path d="M6 6l12 12M18 6L6 18"/>'),
+  minus: icon('<path d="M5 12h14"/>'),
+  plus: icon('<path d="M12 5v14M5 12h14"/>'),
+  group: icon('<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M15 14c3 0 6 1.7 6 5"/>'),
+  odd: icon('<circle cx="10" cy="8" r="3.5"/><path d="M3 20c0-3.6 3.1-6 7-6 1.6 0 3 .4 4.2 1"/><path d="M18 13v4M18 20h.01"/>'),
+  target: icon('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>'),
+  run: icon('<path d="M3 8h7M2 12h6M4 16h5"/><circle cx="17" cy="5" r="2"/><path d="M13 21l2-5 3 2v4M11 11l3-3 3 2 2 3"/>'),
+  ban: icon('<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>'),
+  check: icon('<circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 10"/>'),
+  trophy: icon('<path d="M8 4h8v5a4 4 0 01-8 0z"/><path d="M8 6H5a3 3 0 003 4M16 6h3a3 3 0 01-3 4M12 13v4M8 21h8M9 17h6"/>'),
+  eye: '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M4 32C14 16 50 16 60 32C50 48 14 48 4 32Z" fill="none" stroke="var(--red)" stroke-width="4" stroke-linejoin="round"/><circle cx="32" cy="32" r="10" fill="var(--red)"/><circle cx="32" cy="32" r="4" fill="#160B0D"/></svg>'
+};
+
+/* ---------- Pieces ---------- */
+function topbar(g) {
+  return '<div class="topbar"><span class="badge-round">' + esc(t('round', { n: g.round })) + '</span>' +
+    '<button class="icon-btn" data-act="menu" aria-label="' + esc(t('menu')) + '">' + I.menu + '</button></div>';
+}
+function short(name) { return name.length > 5 ? name.slice(0, 4) + '.' : name; }
+function bold(key, name, more) {
+  // Interface strings are our own text; only the player name needs escaping.
+  var v = more || {}; v.name = '<b>' + esc(name) + '</b>';
+  return t(key, v);
+}
 function roleBanner(isOdd) {
   return isOdd
-    ? '<div class="role odd" role="alert">' + ICON_EYE + '<div class="big">' + esc(t('roleOdd')) + '</div><p>' + esc(t('roleOddSub')) + '</p></div>'
+    ? '<div class="role odd" role="alert">' + I.eye + '<div class="big">' + esc(t('roleOdd')) + '</div><p>' + esc(t('roleOddSub')) + '</p></div>'
     : '<div class="role same">' + esc(t('roleSame')) + '</div>';
 }
-var ICON_CHECK = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M14 34l12 12 24-26" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-var ICON_AWAY = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M12 32h34M34 18l14 14-14 14" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 /* ---------- Screens ---------- */
-function topbar(g) {
-  return '<div class="topbar"><span>' + esc(t('round', { n: g.round })) + '</span>' +
-    '<button class="btn-text" data-act="menu">' + esc(t('menu')) + '</button></div>';
-}
-
 function viewSetup() {
   var n = S.players.length;
-  var list = S.players.map(function (p, i) {
-    return '<li><span class="pname">' + esc(p) + '</span>' +
-      '<button class="chip" data-act="remove" data-i="' + i + '" aria-label="' + esc(t('remove', { name: p })) + '">✕</button></li>';
-  }).join('');
   var need = Math.max(0, MIN_P - n);
+  var list = S.players.map(function (p, i) {
+    return '<li><span class="num">' + (i < 9 ? '0' : '') + (i + 1) + '</span><span class="pname">' + esc(p) + '</span>' +
+      '<button class="chip" data-act="remove" data-i="' + i + '" aria-label="' + esc(t('remove', { name: p })) + '">' + I.x + '</button></li>';
+  }).join('');
   return '' +
     '<section class="brand">' +
-      '<div class="mark" aria-hidden="true">?</div>' +
+      '<div class="logo" aria-hidden="true">?</div>' +
       '<h1>The Odd Question</h1>' +
       '<p class="muted">' + esc(t('tagline')) + '</p>' +
     '</section>' +
-    (S.game ? '<button class="btn btn-primary" data-act="continue">' + esc(t('continueGame')) + '</button>' : '') +
+    (S.game ? '<button class="btn btn-go" data-act="continue">' + esc(t('continueGame')) + I.arrow + '</button>' : '') +
     '<section class="stack">' +
       '<div class="label" id="lang-label">' + esc(t('language')) + '</div>' +
       '<div class="seg" role="group" aria-labelledby="lang-label">' +
@@ -838,131 +1000,143 @@ function viewSetup() {
       (n < MAX_P
         ? '<form class="addrow" id="addform" autocomplete="off">' +
             '<input id="name-input" name="name" maxlength="18" placeholder="' + esc(t('namePh')) + '" aria-label="' + esc(t('namePh')) + '" enterkeyhint="done" autocapitalize="words">' +
-            '<button class="btn btn-soft" type="submit">' + esc(t('add')) + '</button>' +
+            '<button class="btn btn-ghost" type="submit">' + esc(t('add')) + '</button>' +
           '</form>'
-        : '<p class="muted small">' + esc(t('full')) + '</p>') +
-      (ui.error ? '<p class="small" style="color:var(--rose-ink);font-weight:700" role="alert">' + esc(ui.error) + '</p>' : '') +
+        : '<p class="muted">' + esc(t('full')) + '</p>') +
+      (ui.error ? '<p class="error" role="alert">' + esc(ui.error) + '</p>' : '') +
     '</section>' +
     '<section class="stack">' +
       '<div class="label" id="target-label">' + esc(t('target')) + '</div>' +
       '<div class="stepper" role="group" aria-labelledby="target-label">' +
-        '<button class="btn btn-soft" data-act="target" data-d="-1" aria-label="' + esc(t('fewer')) + '"' + (S.target <= 3 ? ' disabled' : '') + '>−</button>' +
+        '<button class="btn btn-ghost" data-act="target" data-d="-1" aria-label="' + esc(t('fewer')) + '"' + (S.target <= 3 ? ' disabled' : '') + '>' + I.minus + '</button>' +
         '<div class="val" aria-live="polite">' + S.target + '</div>' +
-        '<button class="btn btn-soft" data-act="target" data-d="1" aria-label="' + esc(t('more')) + '"' + (S.target >= 50 ? ' disabled' : '') + '>+</button>' +
+        '<button class="btn btn-ghost" data-act="target" data-d="1" aria-label="' + esc(t('more')) + '"' + (S.target >= 50 ? ' disabled' : '') + '>' + I.plus + '</button>' +
       '</div>' +
     '</section>' +
-    '<details class="rules card"><summary>' + esc(t('rulesTitle')) + '</summary><ol>' +
+    '<details class="rules panel"><summary>' + esc(t('rulesTitle')) + '</summary><ol>' +
       t('rules').map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('') +
     '</ol></details>' +
-    '<div class="stack push">' +
-      '<button class="btn btn-primary" data-act="start"' + (need ? ' disabled' : '') + '>' + esc(t('start')) + '</button>' +
-      (need ? '<p class="muted small center">' + esc(t('needMore', { n: need })) + '</p>' : '') +
+    '<div class="dock">' +
+      '<button class="btn btn-go" data-act="start"' + (need ? ' disabled' : '') + '>' + esc(t('start')) + I.arrow + '</button>' +
+      (need ? '<p class="muted center">' + esc(t('needMore', { n: need })) + '</p>' : '') +
     '</div>';
-}
-
-function progressDots(g) {
-  return '<div class="progress" aria-hidden="true">' + g.order.map(function (_, i) {
-    return '<span class="' + (i < g.passIdx ? 'done' : i === g.passIdx ? 'now' : '') + '"></span>';
-  }).join('') + '</div>';
 }
 
 function viewPass(g) {
   var name = g.order[g.passIdx];
+  var turns = g.order.map(function (p, i) {
+    return '<div class="turn ' + (i < g.passIdx ? 'done' : i === g.passIdx ? 'now' : '') + '"><i></i>' + esc(short(p)) + '</div>';
+  }).join('');
   return topbar(g) +
-    '<div class="pass-hero">' + ICON_PHONE +
-      '<p class="muted">' + esc(t('passTo')) + '</p>' +
+    '<div class="pass">' +
+      '<div class="rings"><div class="glow">' + I.phone + '</div></div>' +
+      '<div class="label">' + esc(t('passTo')) + '</div>' +
       '<div class="who">' + esc(name) + '</div>' +
-      '<p class="muted small">' + esc(t('onlyYou', { name: name })) + '</p>' +
+      '<p class="muted">' + bold('onlyYou', name) + '</p>' +
+      '<div class="divider"></div>' +
+      '<div class="label">' + esc(t('playerTurns', { i: g.passIdx + 1, n: g.order.length })) + '</div>' +
+      '<div class="turns" aria-hidden="true">' + turns + '</div>' +
     '</div>' +
-    progressDots(g) +
-    '<div class="stack push"><button class="btn btn-primary" data-act="show">' + esc(t('show')) + '</button></div>';
+    '<div class="dock"><button class="btn btn-go" data-act="show">' + I.arrow + esc(t('show')) + '</button></div>';
 }
 
 function viewShow(g) {
   var name = g.order[g.passIdx];
   var pair = PAIRS[g.pairId][S.lang];
-  var q = name === g.odd ? pair[1] : pair[0];
-  return roleBanner(name === g.odd) +
-    '<div class="label">' + esc(t('yourQuestion', { name: name })) + '</div>' +
-    '<div class="card"><p class="question">' + esc(q) + '</p></div>' +
+  var isOdd = name === g.odd;
+  return roleBanner(isOdd) +
+    '<div class="panel">' +
+      '<div class="label">' + esc(t('yourQuestion', { name: name })) + '</div>' +
+      '<p class="question">' + esc(isOdd ? pair[1] : pair[0]) + '</p>' +
+    '</div>' +
     '<p class="hint">' + esc(T[S.lang].hint[PAIRS[g.pairId].type]) + '</p>' +
     '<p class="muted">' + esc(t('keepSecret')) + '</p>' +
-    '<div class="stack push"><button class="btn btn-primary" data-act="hide">' + esc(t('hide')) + '</button></div>';
+    '<div class="dock"><button class="btn btn-go" data-act="hide">' + I.arrow + esc(t('hide')) + '</button></div>';
 }
 
 function viewAnswer(g) {
+  var point = PAIRS[g.pairId].type === 'person';
   return topbar(g) +
-    '<div class="stack center" style="padding-top:4vh">' +
-      '<div class="countdown" aria-hidden="true"><span>1</span><span>2</span><span>3</span></div>' +
-      '<h2>' + esc(t(PAIRS[g.pairId].type === 'person' ? 'everyonePoint' : 'everyone')) + '</h2>' +
+    '<div class="stack center" style="padding-top:3vh;gap:28px">' +
+      '<div class="eyebrow">' + esc(t('suspicion')) + '</div>' +
+      '<div class="count" aria-hidden="true"><span class="n">1</span><span class="dash"></span><span class="n">2</span><span class="dash"></span><span class="n go glow">3</span></div>' +
+      '<h2>' + esc(t(point ? 'pointOn3a' : 'sayOn3a')) + ' <em>' + esc(t('on3')) + '</em></h2>' +
       '<p class="muted">' + esc(t('talk')) + '</p>' +
     '</div>' +
-    '<div class="stack push"><button class="btn btn-primary" data-act="tovote">' + esc(t('readyVote')) + '</button></div>';
+    '<div class="dock"><button class="btn btn-danger" data-act="tovote">' + I.star + esc(t('readyVote')) + I.arrow + '</button></div>';
 }
 
 function viewVote(g) {
   return topbar(g) +
-    '<h2>' + esc(t('whoOdd')) + '</h2>' +
-    '<p class="muted">' + esc(t('tie')) + '</p>' +
+    '<div class="eyebrow">' + esc(t('voting')) + '</div>' +
+    '<h2 class="center">' + esc(t('whoOdd')) + '</h2>' +
+    '<p class="muted center">' + esc(t('tie')) + '</p>' +
     '<div class="vote-grid">' + g.players.map(function (p, i) {
-      return '<button class="btn btn-soft" data-act="accuse" data-i="' + i + '">' + esc(p) + '</button>';
+      return '<button class="vote" data-act="accuse" data-i="' + i + '"><span class="av" aria-hidden="true">' + esc(p.charAt(0).toUpperCase()) + '</span>' + esc(p) + '</button>';
     }).join('') + '</div>';
 }
 
 function viewConfirm(g) {
   return topbar(g) +
-    '<div class="stack center" style="padding-top:4vh">' +
-      '<p class="muted">' + esc(t('youChose')) + '</p>' +
-      '<div class="oddname">' + esc(g.accused) + '</div>' +
-      '<p>' + esc(t('sure')) + '</p>' +
-    '</div>' +
-    '<div class="stack push">' +
-      '<button class="btn btn-primary" data-act="reveal">' + esc(t('yesReveal')) + '</button>' +
-      '<button class="btn btn-soft" data-act="revote">' + esc(t('chooseAgain')) + '</button>' +
+    '<div class="eyebrow">' + esc(t('voting')) + '</div>' +
+    '<p class="muted center">' + esc(t('youChose')) + '</p>' +
+    '<div class="target-ring">' + esc(g.accused) + '</div>' +
+    '<p class="center">' + esc(t('sure')) + '</p>' +
+    '<div class="dock">' +
+      '<button class="btn btn-danger" data-act="reveal">' + I.target + esc(t('yesReveal')) + '</button>' +
+      '<button class="btn btn-ghost" data-act="revote">' + esc(t('chooseAgain')) + '</button>' +
     '</div>';
 }
 
-function questionsBlock(g) {
+function questionCards(g) {
   var pair = PAIRS[g.pairId][S.lang];
-  return '<div class="card sage"><div class="label">' + esc(t('realQ')) + '</div><p class="qtext">' + esc(pair[0]) + '</p></div>' +
-    '<div class="card rose"><div class="label">' + esc(t('oddQ')) + '</div><p class="qtext">' + esc(pair[1]) + '</p></div>';
+  var group = g.players.filter(function (p) { return p !== g.odd; }).map(esc).join(' · ');
+  return '<div class="qcards">' +
+    '<div class="qcard"><div class="label"><span class="qi">' + I.group + '</span>' + esc(t('realQ')) + '</div>' +
+      '<p class="qtext">' + esc(pair[0]) + '</p><p class="who-list">' + group + '</p></div>' +
+    '<div class="qcard odd"><div class="label"><span class="qi">' + I.odd + '</span>' + esc(t('oddQ')) + '</div>' +
+      '<p class="qtext">' + esc(pair[1]) + '</p><p class="who-list">' + esc(t('oddOnly', { name: g.odd })) + '</p></div>' +
+  '</div>';
 }
 
 function viewReveal(g) {
   var caught = g.accused === g.odd;
-  var head = caught
-    ? '<div class="verdict win"><div class="badge">' + ICON_CHECK + '</div><h2>' + esc(t('caught')) + '</h2><p class="muted">' + esc(t('caughtSub')) + '</p></div>'
-    : '<div class="verdict lose"><div class="badge">' + ICON_AWAY + '</div><h2>' + esc(t('escaped')) + '</h2><p class="muted">' + esc(t('escapedSub', { name: g.accused })) + '</p></div>';
-  var who = '<div class="stack center"><p class="muted">' + esc(t('oddWas')) + '</p><div class="oddname">' + esc(g.odd) + '</div></div>';
-  var body = '', actions = '';
-
+  var hero = caught
+    ? '<div class="hero caught">' + I.target + '<h2>' + esc(t('caught')) + '</h2><p>' + esc(t('caughtSub')) + '</p></div>' +
+      '<div class="strip">' + I.check + '<span>' + bold('caughtStrip', g.odd) + '</span></div>'
+    : '<div class="hero escaped">' + I.run + '<h2>' + esc(t('escaped')) + '</h2><p>' + esc(t('heroEscapedSub')) + '</p></div>' +
+      '<div class="strip">' + I.ban + '<span>' + bold('escapedSub', g.accused) + '</span></div>';
+  var body = '', dock = '';
   if (g.revealStep === 'guessing') {
-    body = '<div class="card honey"><p class="points-line">' + esc(t('guessAsk', { name: g.odd })) + '</p></div>';
-    actions = '<button class="btn btn-primary" data-act="showqs">' + esc(t('showQs')) + '</button>';
+    body = '<div class="callout">' + bold('guessAsk', g.odd) + '</div>';
+    dock = '<button class="btn btn-go" data-act="showqs">' + I.arrow + esc(t('showQs')) + '</button>';
   } else if (g.revealStep === 'questions') {
-    body = questionsBlock(g) +
-      '<h2 style="font-size:clamp(30px,7vw,40px)">' + esc(t('didGuess', { name: g.odd })) + '</h2>';
-    actions = '<div class="row">' +
-      '<button class="btn btn-primary" data-act="guess" data-v="1">' + esc(t('yes')) + '</button>' +
-      '<button class="btn btn-soft" data-act="guess" data-v="0">' + esc(t('no')) + '</button></div>';
+    body = questionCards(g) + '<h2 class="center" style="font-size:clamp(30px,7.5vw,40px)">' + esc(t('didGuess', { name: g.odd })) + '</h2>';
+    dock = '<div class="row">' +
+      '<button class="btn btn-go" data-act="guess" data-v="1">' + esc(t('yes')) + '</button>' +
+      '<button class="btn btn-ghost" data-act="guess" data-v="0">' + esc(t('no')) + '</button></div>';
   } else {
     var lines = caught
-      ? '<p class="points-line">' + esc(t('ptsCaught', { name: g.odd })) + '</p>' +
-        (g.guessed ? '<p class="points-line">' + esc(t('ptsGuess', { name: g.odd })) + '</p>' : '')
-      : '<p class="points-line">' + esc(t('ptsEscape', { name: g.odd })) + '</p>';
-    body = questionsBlock(g) + '<div class="card honey">' + lines + '</div>';
-    actions = '<button class="btn btn-primary" data-act="toscores">' + esc(t('seeScores')) + '</button>';
+      ? '<p><span class="plus">+1</span><span>' + esc(t('ptsCaught', { name: g.odd }).replace(/^\+1 \S+ /, '')) + '</span></p>' +
+        (g.guessed ? '<p><span class="plus">+2</span><span>' + esc(t('ptsGuess', { name: g.odd }).replace(/^\+2 \S+ /, '')) + '</span></p>' : '')
+      : '<p><span class="plus">+3</span><span>' + esc(t('ptsEscape', { name: g.odd }).replace(/^\+3 \S+ /, '')) + '</span></p>';
+    body = questionCards(g) +
+      '<div class="panel"><div class="label">' + esc(t('roundPoints')) + '</div><div class="points">' + lines + '</div></div>';
+    dock = '<div class="row">' +
+      '<button class="btn btn-ghost" data-act="toscores">' + I.star + esc(t('seeScores')) + '</button>' +
+      '<button class="btn btn-go" data-act="nextround">' + I.arrow + esc(t('nextRound')) + '</button></div>';
   }
-  return topbar(g) + head + who + body + '<div class="stack push">' + actions + '</div>';
+  return hero + body + '<div class="dock">' + dock + '</div>';
 }
 
 function scoreList(g) {
   var ranked = g.players.slice().sort(function (a, b) { return g.scores[b] - g.scores[a]; });
   var top = g.scores[ranked[0]];
-  return '<ul class="scores">' + ranked.map(function (p) {
+  return '<ul class="scores">' + ranked.map(function (p, i) {
     var gain = g.gains[p] || 0;
     var pct = Math.min(100, Math.round(g.scores[p] / S.target * 100));
     return '<li class="' + (top > 0 && g.scores[p] === top ? 'lead' : '') + '">' +
+      '<span class="rank">' + (i + 1) + '</span>' +
       '<span class="sname">' + esc(p) + '</span>' +
       '<span class="gain' + (gain ? '' : ' none') + '">+' + gain + '</span>' +
       '<span class="pts" aria-label="' + g.scores[p] + ' ' + t('pt') + '">' + g.scores[p] + '</span>' +
@@ -973,10 +1147,11 @@ function scoreList(g) {
 
 function viewScores(g) {
   return topbar(g) +
-    '<h2>' + esc(t('scores')) + '</h2>' +
-    '<p class="muted">' + esc(t('firstTo', { n: S.target })) + '</p>' +
+    '<div class="eyebrow">' + esc(t('standings')) + '</div>' +
+    '<h2 class="center">' + esc(t('scores')) + '</h2>' +
+    '<p class="muted center">' + esc(t('firstTo', { n: S.target })) + '</p>' +
     scoreList(g) +
-    '<div class="stack push"><button class="btn btn-primary" data-act="next">' + esc(t('nextRound')) + '</button></div>';
+    '<div class="dock"><button class="btn btn-go" data-act="nextround">' + I.arrow + esc(t('nextRound')) + '</button></div>';
 }
 
 function viewWinner(g) {
@@ -984,28 +1159,28 @@ function viewWinner(g) {
   g.players.forEach(function (p) { max = Math.max(max, g.scores[p]); });
   var winners = g.players.filter(function (p) { return g.scores[p] === max; });
   var title = winners.length === 1 ? esc(t('wins', { name: winners[0] })) : t('tieWin', { names: joinNames(winners) });
-  return '<div class="verdict win" style="padding-top:2vh"><div class="badge">' + ICON_CHECK + '</div><h1>' + title + '</h1></div>' +
+  return '<div class="hero win">' + I.trophy + '<h1 style="font-size:clamp(38px,10vw,56px)">' + title + '</h1></div>' +
     scoreList(g) +
-    '<div class="stack push">' +
-      '<button class="btn btn-primary" data-act="again">' + esc(t('playAgain')) + '</button>' +
-      '<button class="btn btn-soft" data-act="change">' + esc(t('changePlayers')) + '</button>' +
+    '<div class="dock">' +
+      '<button class="btn btn-go" data-act="again">' + I.arrow + esc(t('playAgain')) + '</button>' +
+      '<button class="btn btn-ghost" data-act="change">' + esc(t('changePlayers')) + '</button>' +
     '</div>';
 }
 
 function viewMenu() {
   if (ui.confirmEnd) {
     return '<h2>' + esc(t('endSure')) + '</h2>' +
-      '<div class="stack push">' +
-        '<button class="btn btn-primary" data-act="endyes">' + esc(t('endYes')) + '</button>' +
-        '<button class="btn btn-soft" data-act="endno">' + esc(t('endNo')) + '</button>' +
+      '<div class="dock">' +
+        '<button class="btn btn-danger" data-act="endyes">' + esc(t('endYes')) + '</button>' +
+        '<button class="btn btn-ghost" data-act="endno">' + esc(t('endNo')) + '</button>' +
       '</div>';
   }
-  return '<h2>' + esc(t('menuTitle')) + '</h2>' +
-    '<p class="muted">' + esc(t('firstTo', { n: S.target })) + '</p>' +
+  return '<div class="eyebrow">' + esc(t('menuTitle')) + '</div>' +
+    '<p class="muted center">' + esc(t('firstTo', { n: S.target })) + '</p>' +
     scoreList(S.game) +
-    '<div class="stack push">' +
-      '<button class="btn btn-primary" data-act="closemenu">' + esc(t('backToGame')) + '</button>' +
-      '<button class="btn btn-soft" data-act="endgame">' + esc(t('newGame')) + '</button>' +
+    '<div class="dock">' +
+      '<button class="btn btn-go" data-act="closemenu">' + I.arrow + esc(t('backToGame')) + '</button>' +
+      '<button class="btn btn-ghost" data-act="endgame">' + esc(t('newGame')) + '</button>' +
     '</div>';
 }
 
@@ -1027,7 +1202,7 @@ function render() {
   }
   var animate = key !== lastKey;
   lastKey = key;
-  app.innerHTML = '<div class="screen' + (animate ? '' : ' still') + '">' + html + '</div>';
+  app.innerHTML = '<div class="screen">' + html + '</div>';
   if (!animate) app.firstChild.style.animation = 'none';
   if (animate) window.scrollTo(0, 0);
 }
@@ -1057,7 +1232,7 @@ app.addEventListener('click', function (e) {
     case 'target':
       S.target = Math.max(3, Math.min(50, S.target + +b.getAttribute('data-d'))); commit(); break;
     case 'start': if (S.players.length >= MIN_P) { ui.error = ''; keepAwake(); startGame(); } break;
-    case 'continue': g.phase = g.phase === 'setup' ? 'scores' : g.phase; keepAwake(); commit(); break;
+    case 'continue': keepAwake(); commit(); break;
     case 'menu': ui.menu = true; ui.confirmEnd = false; render(); break;
     case 'closemenu': ui.menu = false; render(); break;
     case 'endgame': ui.confirmEnd = true; render(); break;
@@ -1075,7 +1250,7 @@ app.addEventListener('click', function (e) {
     case 'showqs': if (g.revealStep === 'guessing') { g.revealStep = 'questions'; commit(); } break;
     case 'guess': answerGuess(b.getAttribute('data-v') === '1'); break;
     case 'toscores': if (g.revealStep === 'done') toScores(); break;
-    case 'next': newRound(); break;
+    case 'nextround': if (g.phase === 'scores' || g.revealStep === 'done') nextOrWin(); break;
     case 'again': S.players = g.players.slice(); startGame(); break;
     case 'change': S.game = null; commit(); break;
   }
