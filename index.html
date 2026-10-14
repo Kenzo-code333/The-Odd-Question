@@ -23,6 +23,7 @@
   --sage-soft: #DDE9E2;
   --rose-soft: #F5E0D6;
   --rose-ink: #7A3524;
+  --rose: #C8664A;         /* the misfit shape */
   --honey-soft: #F6E7BE;
   --honey-ink: #6B4E0C;
   --on-sage: #FFFFFF;
@@ -243,6 +244,17 @@ details.rules ol { margin: 8px 0 0; padding-left: 1.3em; display: flex; flex-dir
 .oddname { font-family: var(--font-display); font-size: clamp(40px, 10vw, 58px); color: var(--sage); overflow-wrap: anywhere; }
 .qtext { font-family: var(--font-display); font-size: clamp(28px, 6.5vw, 38px); line-height: 1.3; }
 .points-line { font-size: 26px; font-weight: 700; }
+/* Sign under the question: matching circles for the group, one misfit for the Odd One.
+   Same size and place for both, so a glance across the table gives nothing away. */
+.sign { display: flex; flex-direction: column; align-items: center; gap: 8px; padding-top: 6px; }
+.sign svg { width: 100%; max-width: 320px; height: auto; overflow: visible; }
+.sign .dot { fill: var(--honey-soft); stroke: var(--honey-ink); stroke-width: 4; transform-box: fill-box; transform-origin: center; animation: pulse 2.6s ease-in-out infinite; }
+.sign .misfit { fill: var(--rose); stroke: var(--rose-ink); stroke-width: 4; transform-box: fill-box; transform-origin: center; animation: wobble 1.4s ease-in-out infinite; }
+.sign p { font-size: 26px; font-weight: 700; text-align: center; }
+@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+@keyframes wobble { 0%,100% { transform: rotate(-14deg) translateY(0); } 50% { transform: rotate(14deg) translateY(-8px); } }
+@media (prefers-reduced-motion: reduce) { .sign .dot, .sign .misfit { animation: none; } }
+.hint { font-size: 28px; font-weight: 700; color: var(--sage); }
 </style>
 </head>
 <body>
@@ -252,7 +264,8 @@ details.rules ol { margin: 8px 0 0; padding-left: 1.3em; display: flex; flex-dir
 (function () {
 'use strict';
 
-/* ---------- Question pairs: [normal, odd] in English and French ---------- */
+/* ---------- Question pairs: [normal, odd] in English and French.
+   Both questions of a pair share an answer type, so the hint never gives the Odd One away. ---------- */
 var PAIRS = [
   { en: ["How many cups of tea or coffee do you drink in a day?", "How many biscuits could you eat with one cup of tea?"],
     fr: ["Combien de tasses de thé ou de café buvez-vous par jour ?", "Combien de biscuits pourriez-vous manger avec une tasse de thé ?"] },
@@ -345,13 +358,139 @@ var PAIRS = [
   { en: ["How many jumpers do you own?", "How many hats do you own?"],
     fr: ["Combien de pulls avez-vous ?", "Combien de chapeaux avez-vous ?"] },
   { en: ["How many grandchildren or godchildren would you love to have?", "How many board games do you have at home?"],
-    fr: ["Combien de petits-enfants ou de filleuls aimeriez-vous avoir ?", "Combien de jeux de société avez-vous à la maison ?"] }
+    fr: ["Combien de petits-enfants ou de filleuls aimeriez-vous avoir ?", "Combien de jeux de société avez-vous à la maison ?"] },
+
+  /* Answer is a food or drink */
+  { type: "food",
+    en: ["What is the best food to take on a picnic?", "What food would you take to a desert island?"],
+    fr: ["Quel est le meilleur plat à emporter en pique-nique ?", "Quel aliment emporteriez-vous sur une île déserte ?"] },
+  { type: "food",
+    en: ["What is your favourite dessert?", "What would you bake for a birthday party?"],
+    fr: ["Quel est votre dessert préféré ?", "Que prépareriez-vous pour une fête d'anniversaire ?"] },
+  { type: "food",
+    en: ["What did you love to eat when you were a child?", "What would you cook for a very important guest?"],
+    fr: ["Qu'aimiez-vous manger quand vous étiez enfant ?", "Que cuisineriez-vous pour un invité très important ?"] },
+  { type: "food",
+    en: ["What is the best drink on a hot summer day?", "What do you usually order at a café?"],
+    fr: ["Quelle est la meilleure boisson par une chaude journée d'été ?", "Que commandez-vous d'habitude au café ?"] },
+  { type: "food",
+    en: ["Which vegetable do you like the least?", "Which vegetable is the hardest to grow in a garden?"],
+    fr: ["Quel légume aimez-vous le moins ?", "Quel légume est le plus difficile à faire pousser au jardin ?"] },
+  { type: "food",
+    en: ["Which fruit do you eat most often?", "Which fruit makes the best jam?"],
+    fr: ["Quel fruit mangez-vous le plus souvent ?", "Quel fruit fait la meilleure confiture ?"] },
+
+  /* Answer is a place */
+  { type: "place",
+    en: ["Where would you go for a perfect holiday?", "Where would you live if you could move anywhere?"],
+    fr: ["Où iriez-vous pour des vacances parfaites ?", "Où vivriez-vous si vous pouviez déménager n'importe où ?"] },
+  { type: "place",
+    en: ["What is the most beautiful city you have ever visited?", "Which city would you visit for a weekend away?"],
+    fr: ["Quelle est la plus belle ville que vous ayez visitée ?", "Quelle ville visiteriez-vous pour un week-end ?"] },
+  { type: "place",
+    en: ["What is the best place for a picnic?", "What is the best place to read a good book?"],
+    fr: ["Quel est le meilleur endroit pour un pique-nique ?", "Quel est le meilleur endroit pour lire un bon livre ?"] },
+  { type: "place",
+    en: ["Which country has the best food?", "Which country would you most like to visit next?"],
+    fr: ["Quel pays a la meilleure cuisine ?", "Quel pays aimeriez-vous le plus visiter prochainement ?"] },
+  { type: "place",
+    en: ["Which room in your home do you like the most?", "Where in your home do you usually lose your glasses?"],
+    fr: ["Quelle pièce de votre maison préférez-vous ?", "Où perdez-vous le plus souvent vos lunettes chez vous ?"] },
+
+  /* Answer is a colour */
+  { type: "colour",
+    en: ["What is your favourite colour?", "What colour should a front door be?"],
+    fr: ["Quelle est votre couleur préférée ?", "De quelle couleur devrait être une porte d'entrée ?"] },
+  { type: "colour",
+    en: ["What is the best colour for a car?", "What colour would you paint your bedroom?"],
+    fr: ["Quelle est la meilleure couleur pour une voiture ?", "De quelle couleur peindriez-vous votre chambre ?"] },
+  { type: "colour",
+    en: ["What colour reminds you of summer?", "What colour are your favourite flowers?"],
+    fr: ["Quelle couleur vous fait penser à l'été ?", "De quelle couleur sont vos fleurs préférées ?"] },
+
+  /* Answer is an animal */
+  { type: "animal",
+    en: ["Which animal makes the best pet?", "Which animal would you most like to see on a farm?"],
+    fr: ["Quel animal est le meilleur animal de compagnie ?", "Quel animal aimeriez-vous le plus voir dans une ferme ?"] },
+  { type: "animal",
+    en: ["If you were an animal, which one would you be?", "Which animal do you think is the cleverest?"],
+    fr: ["Si vous étiez un animal, lequel seriez-vous ?", "Selon vous, quel animal est le plus intelligent ?"] },
+  { type: "animal",
+    en: ["Which animal do you find the most beautiful?", "Which animal would you love to see in the wild?"],
+    fr: ["Quel animal trouvez-vous le plus beau ?", "Quel animal aimeriez-vous voir en liberté ?"] },
+  { type: "animal",
+    en: ["Which animal are you most afraid of?", "Which animal would you never want in your house?"],
+    fr: ["De quel animal avez-vous le plus peur ?", "Quel animal ne voudriez-vous jamais chez vous ?"] },
+
+  /* Answer is someone in the room: everyone points */
+  { type: "person",
+    en: ["Who here is best at keeping a secret?", "Who here would make the best judge?"],
+    fr: ["Qui, ici, sait le mieux garder un secret ?", "Qui, ici, ferait le meilleur juge ?"] },
+  { type: "person",
+    en: ["Who here is the best cook?", "Who here would you invite to dinner first?"],
+    fr: ["Qui, ici, cuisine le mieux ?", "Qui, ici, inviteriez-vous à dîner en premier ?"] },
+  { type: "person",
+    en: ["Who here would win a dance competition?", "Who here would be the most fun at a wedding?"],
+    fr: ["Qui, ici, gagnerait un concours de danse ?", "Qui, ici, mettrait le plus d'ambiance à un mariage ?"] },
+  { type: "person",
+    en: ["Who here is most likely to arrive late?", "Who here takes the longest to get ready?"],
+    fr: ["Qui, ici, risque le plus d'arriver en retard ?", "Qui, ici, met le plus de temps à se préparer ?"] },
+  { type: "person",
+    en: ["Who here would do best on a desert island?", "Who here is the handiest at fixing things?"],
+    fr: ["Qui, ici, s'en sortirait le mieux sur une île déserte ?", "Qui, ici, est le plus doué pour bricoler ?"] },
+  { type: "person",
+    en: ["Who here tells the best stories?", "Who here would make the best teacher?"],
+    fr: ["Qui, ici, raconte les meilleures histoires ?", "Qui, ici, ferait le meilleur professeur ?"] },
+  { type: "person",
+    en: ["Who here has the best laugh?", "Who here always cheers you up?"],
+    fr: ["Qui, ici, a le plus beau rire ?", "Qui, ici, vous remonte toujours le moral ?"] },
+
+  /* Answer is a famous person */
+  { type: "famous",
+    en: ["Which singer would you most like to see in concert?", "Which famous person would you invite to dinner?"],
+    fr: ["Quel chanteur ou quelle chanteuse aimeriez-vous voir en concert ?", "Quelle personne célèbre inviteriez-vous à dîner ?"] },
+  { type: "famous",
+    en: ["Who is the greatest film star of all time?", "Which film star would you most like to meet?"],
+    fr: ["Quelle est la plus grande vedette de cinéma de tous les temps ?", "Quelle vedette de cinéma aimeriez-vous le plus rencontrer ?"] },
+  { type: "famous",
+    en: ["Who should play you in a film about your life?", "Which famous person do people say you look like?"],
+    fr: ["Qui devrait jouer votre rôle dans un film sur votre vie ?", "À quelle personne célèbre dit-on que vous ressemblez ?"] },
+
+  /* Answer is an object */
+  { type: "thing",
+    en: ["What object would you take to a desert island?", "What object at home could you not live without?"],
+    fr: ["Quel objet emporteriez-vous sur une île déserte ?", "Sans quel objet de la maison ne pourriez-vous pas vivre ?"] },
+  { type: "thing",
+    en: ["What was your favourite toy as a child?", "What is the perfect present for a child?"],
+    fr: ["Quel était votre jouet préféré quand vous étiez enfant ?", "Quel est le cadeau parfait pour un enfant ?"] },
+  { type: "thing",
+    en: ["What is the most useful thing in a kitchen?", "Which kitchen tool do you use the most?"],
+    fr: ["Quel est l'objet le plus utile dans une cuisine ?", "Quel ustensile de cuisine utilisez-vous le plus ?"] },
+  { type: "thing",
+    en: ["What is the best present you have ever received?", "What would you buy if you won a small prize?"],
+    fr: ["Quel est le plus beau cadeau que vous ayez reçu ?", "Qu'achèteriez-vous si vous gagniez un petit lot ?"] },
+
+  /* Answer is a season, a day, a hobby or a sport */
+  { type: "season",
+    en: ["What is the best season of the year?", "In which season do you feel the most energetic?"],
+    fr: ["Quelle est la plus belle saison de l'année ?", "En quelle saison vous sentez-vous le plus en forme ?"] },
+  { type: "day",
+    en: ["Which day of the week is your favourite?", "Which day of the week is best for a family meal?"],
+    fr: ["Quel est votre jour de la semaine préféré ?", "Quel jour de la semaine est idéal pour un repas de famille ?"] },
+  { type: "hobby",
+    en: ["What is your favourite pastime?", "What would you do with a free afternoon?"],
+    fr: ["Quel est votre passe-temps préféré ?", "Que feriez-vous d'un après-midi libre ?"] },
+  { type: "sport",
+    en: ["Which sport do you most like to watch?", "Which sport would you have liked to be good at?"],
+    fr: ["Quel sport aimez-vous le plus regarder ?", "Dans quel sport auriez-vous aimé être doué ?"] }
 ];
+// Pairs without a type have a number as the answer.
+PAIRS.forEach(function (p) { if (!p.type) p.type = 'number'; });
 
 /* ---------- Interface text ---------- */
 var T = {
   en: {
-    tagline: "A gentle party game of numbers and one odd question.",
+    tagline: "A gentle party game where everyone answers the same question, except one.",
     language: "Language",
     players: "Players",
     playersHint: "Add 3 to 10 players.",
@@ -369,8 +508,8 @@ var T = {
     rulesTitle: "How to play",
     rules: [
       "Pass the phone around. Each person reads their question in secret.",
-      "Everyone has the same question, except one person: the Odd One.",
-      "Everyone says their answer (a number) on 3.",
+      "Everyone has the same question, except one person: the Odd One. A picture tells you if it's you.",
+      "Everyone says their answer on 3: a number, a place, a person…",
       "Talk it over and vote: who had a different question?"
     ],
     round: "Round {n}",
@@ -379,9 +518,26 @@ var T = {
     onlyYou: "Only {name} should look at the screen.",
     show: "Show my question",
     yourQuestion: "Your question, {name}",
-    remember: "Think of your answer. It is a number. Keep it secret!",
+    hint: {
+      number: "Your answer is a number.",
+      food: "Your answer is a food or a drink.",
+      place: "Your answer is a place.",
+      colour: "Your answer is a colour.",
+      animal: "Your answer is an animal.",
+      person: "Your answer is someone in this room. You will point at them.",
+      famous: "Your answer is a famous person.",
+      thing: "Your answer is an object.",
+      season: "Your answer is a season.",
+      day: "Your answer is a day of the week.",
+      hobby: "Your answer is something you like to do.",
+      sport: "Your answer is a sport."
+    },
+    keepSecret: "Think of it and keep it secret!",
+    signSame: "Your shapes all match.",
+    signOdd: "One shape is different. You are the Odd One!",
     hide: "Hide and pass",
     everyone: "Everyone say your answer on 3!",
+    everyonePoint: "Everyone point at your answer on 3!",
     talk: "Then talk it over. Whose answer sounds a little odd?",
     readyVote: "Ready to vote",
     whoOdd: "Who is the Odd One?",
@@ -423,7 +579,7 @@ var T = {
     pt: "pts"
   },
   fr: {
-    tagline: "Un jeu de société tout en douceur, des nombres et une question intruse.",
+    tagline: "Un jeu de société tout en douceur : tout le monde répond à la même question, sauf un.",
     language: "Langue",
     players: "Joueurs",
     playersHint: "Ajoutez de 3 à 10 joueurs.",
@@ -441,8 +597,8 @@ var T = {
     rulesTitle: "Comment jouer",
     rules: [
       "Faites passer le téléphone. Chacun lit sa question en secret.",
-      "Tout le monde a la même question, sauf une personne : l'Intrus.",
-      "Tout le monde dit sa réponse (un nombre) à 3.",
+      "Tout le monde a la même question, sauf une personne : l'Intrus. Une image vous dit si c'est vous.",
+      "Tout le monde dit sa réponse à 3 : un nombre, un lieu, une personne…",
       "Discutez puis votez : qui avait une autre question ?"
     ],
     round: "Manche {n}",
@@ -451,9 +607,26 @@ var T = {
     onlyYou: "Personne d'autre que {name} ne doit regarder l'écran.",
     show: "Voir ma question",
     yourQuestion: "Votre question, {name}",
-    remember: "Pensez à votre réponse. C'est un nombre. Gardez-la secrète !",
+    hint: {
+      number: "Votre réponse est un nombre.",
+      food: "Votre réponse est un aliment ou une boisson.",
+      place: "Votre réponse est un lieu.",
+      colour: "Votre réponse est une couleur.",
+      animal: "Votre réponse est un animal.",
+      person: "Votre réponse est une personne de la pièce. Vous la montrerez du doigt.",
+      famous: "Votre réponse est une personne célèbre.",
+      thing: "Votre réponse est un objet.",
+      season: "Votre réponse est une saison.",
+      day: "Votre réponse est un jour de la semaine.",
+      hobby: "Votre réponse est une activité que vous aimez.",
+      sport: "Votre réponse est un sport."
+    },
+    keepSecret: "Pensez-y et gardez-la secrète !",
+    signSame: "Vos formes sont toutes pareilles.",
+    signOdd: "Une forme est différente. Vous êtes l'Intrus !",
     hide: "Cacher et passer",
     everyone: "Tout le monde dit sa réponse à 3 !",
+    everyonePoint: "Tout le monde montre sa réponse du doigt à 3 !",
     talk: "Puis discutez. Quelle réponse semble un peu bizarre ?",
     readyVote: "Prêts à voter",
     whoOdd: "Qui est l'Intrus ?",
@@ -615,6 +788,17 @@ function commit() { save(); render(); }
 
 /* ---------- Icons ---------- */
 var ICON_PHONE = '<svg class="phone-icon breathe" viewBox="0 0 96 96" aria-hidden="true"><circle cx="48" cy="48" r="46" fill="var(--honey-soft)"/><rect x="31" y="18" width="34" height="60" rx="7" fill="var(--surface)" stroke="var(--honey-ink)" stroke-width="4"/><circle cx="48" cy="68" r="3.5" fill="var(--honey-ink)"/><path d="M41 26h14" stroke="var(--honey-ink)" stroke-width="4" stroke-linecap="round"/></svg>';
+function sign(isOdd) {
+  var shapes = '';
+  for (var i = 0; i < 5; i++) {
+    var x = 30 + i * 60;
+    shapes += (isOdd && i === 3)
+      ? '<rect class="misfit" x="' + (x - 20) + '" y="15" width="40" height="40" rx="6"/>'
+      : '<circle class="dot" cx="' + x + '" cy="35" r="22"/>';
+  }
+  return '<div class="sign"><svg viewBox="0 0 300 70" aria-hidden="true">' + shapes + '</svg>' +
+    '<p>' + esc(t(isOdd ? 'signOdd' : 'signSame')) + '</p></div>';
+}
 var ICON_CHECK = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M14 34l12 12 24-26" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 var ICON_AWAY = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M12 32h34M34 18l14 14-14 14" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
@@ -695,10 +879,11 @@ function viewShow(g) {
   var name = g.order[g.passIdx];
   var pair = PAIRS[g.pairId][S.lang];
   var q = name === g.odd ? pair[1] : pair[0];
-  // Same layout for everyone, so nothing gives the Odd One away.
+  // Same layout for everyone; only the shape row tells the Odd One who they are.
   return '<div class="label">' + esc(t('yourQuestion', { name: name })) + '</div>' +
-    '<div class="card"><p class="question">' + esc(q) + '</p></div>' +
-    '<p class="muted">' + esc(t('remember')) + '</p>' +
+    '<div class="card"><p class="question">' + esc(q) + '</p>' + sign(name === g.odd) + '</div>' +
+    '<p class="hint">' + esc(T[S.lang].hint[PAIRS[g.pairId].type]) + '</p>' +
+    '<p class="muted">' + esc(t('keepSecret')) + '</p>' +
     '<div class="stack push"><button class="btn btn-primary" data-act="hide">' + esc(t('hide')) + '</button></div>';
 }
 
@@ -706,7 +891,7 @@ function viewAnswer(g) {
   return topbar(g) +
     '<div class="stack center" style="padding-top:4vh">' +
       '<div class="countdown" aria-hidden="true"><span>1</span><span>2</span><span>3</span></div>' +
-      '<h2>' + esc(t('everyone')) + '</h2>' +
+      '<h2>' + esc(t(PAIRS[g.pairId].type === 'person' ? 'everyonePoint' : 'everyone')) + '</h2>' +
       '<p class="muted">' + esc(t('talk')) + '</p>' +
     '</div>' +
     '<div class="stack push"><button class="btn btn-primary" data-act="tovote">' + esc(t('readyVote')) + '</button></div>';
