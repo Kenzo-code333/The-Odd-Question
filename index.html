@@ -23,7 +23,8 @@
   --sage-soft: #DDE9E2;
   --rose-soft: #F5E0D6;
   --rose-ink: #7A3524;
-  --rose: #C8664A;         /* the misfit shape */
+  --night: #141010;        /* Odd One banner */
+  --alarm: #FF3B30;        /* Odd One red */
   --honey-soft: #F6E7BE;
   --honey-ink: #6B4E0C;
   --on-sage: #FFFFFF;
@@ -244,16 +245,21 @@ details.rules ol { margin: 8px 0 0; padding-left: 1.3em; display: flex; flex-dir
 .oddname { font-family: var(--font-display); font-size: clamp(40px, 10vw, 58px); color: var(--sage); overflow-wrap: anywhere; }
 .qtext { font-family: var(--font-display); font-size: clamp(28px, 6.5vw, 38px); line-height: 1.3; }
 .points-line { font-size: 26px; font-weight: 700; }
-/* Sign under the question: matching circles for the group, one misfit for the Odd One.
-   Same size and place for both, so a glance across the table gives nothing away. */
-.sign { display: flex; flex-direction: column; align-items: center; gap: 8px; padding-top: 6px; }
-.sign svg { width: 100%; max-width: 320px; height: auto; overflow: visible; }
-.sign .dot { fill: var(--honey-soft); stroke: var(--honey-ink); stroke-width: 4; transform-box: fill-box; transform-origin: center; animation: pulse 2.6s ease-in-out infinite; }
-.sign .misfit { fill: var(--rose); stroke: var(--rose-ink); stroke-width: 4; transform-box: fill-box; transform-origin: center; animation: wobble 1.4s ease-in-out infinite; }
-.sign p { font-size: 26px; font-weight: 700; text-align: center; }
-@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
-@keyframes wobble { 0%,100% { transform: rotate(-14deg) translateY(0); } 50% { transform: rotate(14deg) translateY(-8px); } }
-@media (prefers-reduced-motion: reduce) { .sign .dot, .sign .misfit { animation: none; } }
+/* Role banner above the question: black and red alarm for the Odd One, calm green for the group. */
+.role { border-radius: 26px; padding: 22px 24px; display: flex; flex-direction: column; gap: 6px; text-align: center; }
+.role.same { background: var(--sage-soft); border: 3px solid #C3D8CC; color: var(--sage); font-size: 26px; font-weight: 700; }
+.role.odd { background: var(--night); border: 4px solid var(--alarm); color: #FFFFFF; animation: alarm 2.2s ease-in-out infinite; }
+.role.odd .big {
+  font-family: var(--font-display); font-size: clamp(38px, 10vw, 56px); line-height: 1.1;
+  color: var(--alarm); text-transform: uppercase; letter-spacing: .03em; text-shadow: 0 0 18px rgba(255, 59, 48, .55);
+}
+.role.odd p { font-size: 26px; font-weight: 700; }
+.role.odd svg { width: 64px; height: 64px; margin: 0 auto; }
+@keyframes alarm {
+  0%,100% { box-shadow: 0 0 0 0 rgba(255, 59, 48, .0); }
+  50% { box-shadow: 0 0 28px 6px rgba(255, 59, 48, .55); }
+}
+@media (prefers-reduced-motion: reduce) { .role.odd { animation: none; } }
 .hint { font-size: 28px; font-weight: 700; color: var(--sage); }
 </style>
 </head>
@@ -508,7 +514,7 @@ var T = {
     rulesTitle: "How to play",
     rules: [
       "Pass the phone around. Each person reads their question in secret.",
-      "Everyone has the same question, except one person: the Odd One. A picture tells you if it's you.",
+      "Everyone has the same question, except one person: the Odd One. The screen tells you if it's you.",
       "Everyone says their answer on 3: a number, a place, a person…",
       "Talk it over and vote: who had a different question?"
     ],
@@ -533,8 +539,9 @@ var T = {
       sport: "Your answer is a sport."
     },
     keepSecret: "Think of it and keep it secret!",
-    signSame: "Your shapes all match.",
-    signOdd: "One shape is different. You are the Odd One!",
+    roleSame: "You have the group's question.",
+    roleOdd: "You are the Odd One!",
+    roleOddSub: "Your question is different. Blend in and don't get caught!",
     hide: "Hide and pass",
     everyone: "Everyone say your answer on 3!",
     everyonePoint: "Everyone point at your answer on 3!",
@@ -597,7 +604,7 @@ var T = {
     rulesTitle: "Comment jouer",
     rules: [
       "Faites passer le téléphone. Chacun lit sa question en secret.",
-      "Tout le monde a la même question, sauf une personne : l'Intrus. Une image vous dit si c'est vous.",
+      "Tout le monde a la même question, sauf une personne : l'Intrus. L'écran vous dit si c'est vous.",
       "Tout le monde dit sa réponse à 3 : un nombre, un lieu, une personne…",
       "Discutez puis votez : qui avait une autre question ?"
     ],
@@ -622,8 +629,9 @@ var T = {
       sport: "Votre réponse est un sport."
     },
     keepSecret: "Pensez-y et gardez-la secrète !",
-    signSame: "Vos formes sont toutes pareilles.",
-    signOdd: "Une forme est différente. Vous êtes l'Intrus !",
+    roleSame: "Vous avez la question du groupe.",
+    roleOdd: "Vous êtes l'Intrus !",
+    roleOddSub: "Votre question est différente. Fondez-vous dans le groupe sans vous faire prendre !",
     hide: "Cacher et passer",
     everyone: "Tout le monde dit sa réponse à 3 !",
     everyonePoint: "Tout le monde montre sa réponse du doigt à 3 !",
@@ -788,16 +796,11 @@ function commit() { save(); render(); }
 
 /* ---------- Icons ---------- */
 var ICON_PHONE = '<svg class="phone-icon breathe" viewBox="0 0 96 96" aria-hidden="true"><circle cx="48" cy="48" r="46" fill="var(--honey-soft)"/><rect x="31" y="18" width="34" height="60" rx="7" fill="var(--surface)" stroke="var(--honey-ink)" stroke-width="4"/><circle cx="48" cy="68" r="3.5" fill="var(--honey-ink)"/><path d="M41 26h14" stroke="var(--honey-ink)" stroke-width="4" stroke-linecap="round"/></svg>';
-function sign(isOdd) {
-  var shapes = '';
-  for (var i = 0; i < 5; i++) {
-    var x = 30 + i * 60;
-    shapes += (isOdd && i === 3)
-      ? '<rect class="misfit" x="' + (x - 20) + '" y="15" width="40" height="40" rx="6"/>'
-      : '<circle class="dot" cx="' + x + '" cy="35" r="22"/>';
-  }
-  return '<div class="sign"><svg viewBox="0 0 300 70" aria-hidden="true">' + shapes + '</svg>' +
-    '<p>' + esc(t(isOdd ? 'signOdd' : 'signSame')) + '</p></div>';
+var ICON_EYE = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M4 32C14 16 50 16 60 32C50 48 14 48 4 32Z" fill="none" stroke="var(--alarm)" stroke-width="4" stroke-linejoin="round"/><circle cx="32" cy="32" r="10" fill="var(--alarm)"/><circle cx="32" cy="32" r="4" fill="var(--night)"/></svg>';
+function roleBanner(isOdd) {
+  return isOdd
+    ? '<div class="role odd" role="alert">' + ICON_EYE + '<div class="big">' + esc(t('roleOdd')) + '</div><p>' + esc(t('roleOddSub')) + '</p></div>'
+    : '<div class="role same">' + esc(t('roleSame')) + '</div>';
 }
 var ICON_CHECK = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M14 34l12 12 24-26" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 var ICON_AWAY = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M12 32h34M34 18l14 14-14 14" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -879,9 +882,9 @@ function viewShow(g) {
   var name = g.order[g.passIdx];
   var pair = PAIRS[g.pairId][S.lang];
   var q = name === g.odd ? pair[1] : pair[0];
-  // Same layout for everyone; only the shape row tells the Odd One who they are.
-  return '<div class="label">' + esc(t('yourQuestion', { name: name })) + '</div>' +
-    '<div class="card"><p class="question">' + esc(q) + '</p>' + sign(name === g.odd) + '</div>' +
+  return roleBanner(name === g.odd) +
+    '<div class="label">' + esc(t('yourQuestion', { name: name })) + '</div>' +
+    '<div class="card"><p class="question">' + esc(q) + '</p></div>' +
     '<p class="hint">' + esc(T[S.lang].hint[PAIRS[g.pairId].type]) + '</p>' +
     '<p class="muted">' + esc(t('keepSecret')) + '</p>' +
     '<div class="stack push"><button class="btn btn-primary" data-act="hide">' + esc(t('hide')) + '</button></div>';

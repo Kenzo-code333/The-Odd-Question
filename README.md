@@ -2,7 +2,7 @@
 
 A pass-and-play party game for 3–10 players, designed for older players: very large text, high contrast, big buttons, no timers and no typing during play. English and French.
 
-Everyone gets the same question, except the Odd One, who gets a slightly different one. Answers can be a number, a food, a place, a colour, an animal, a famous person, an object, or someone in the room (everyone points on 3). Under each question is a row of shapes: they all match for everyone else, and one is different and wobbles for the Odd One, so they know to blend in. Everyone answers on 3, then the group votes on who had the odd question.
+Everyone gets the same question, except the Odd One, who gets a slightly different one. Answers can be a number, a food, a place, a colour, an animal, a famous person, an object, or someone in the room (everyone points on 3). Above the question, the Odd One sees a black banner with glowing red letters saying they are the Odd One, so they know to blend in; everyone else sees a calm green "You have the group's question". Everyone answers on 3, then the group votes on who had the odd question.
 
 **Scoring:** catch the Odd One → +1 to everyone else. The Odd One escapes → +3 to them. Caught, but guessed the real question → +2 to the Odd One. First to 10 points wins (adjustable).
 
