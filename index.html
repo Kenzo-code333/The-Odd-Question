@@ -288,6 +288,75 @@ details.rules ol { margin: 8px 0 0; padding-left: 1.3em; display: flex; flex-dir
 .bar { grid-column: 1 / -1; height: 10px; border-radius: 5px; background: #222C3B; overflow: hidden; }
 .bar i { display: block; height: 100%; border-radius: 5px; background: linear-gradient(90deg, var(--teal-deep), var(--teal)); transition: width .8s ease; }
 .scores li.lead .bar i { background: var(--amber); }
+/* Compact pass: every screen fits one phone screen without scrolling (up to 10 players). */
+#app { padding-block: 12px 14px; }
+.screen { gap: 14px; }
+.stack { gap: 8px; }
+.dock { padding-top: 4px; gap: 10px; }
+.btn { min-height: 54px; padding: 10px 14px; }
+.label, .eyebrow, .badge-round { font-size: 14px; }
+.icon-btn { width: 48px; height: 48px; border-radius: 14px; }
+.icon-btn svg { width: 24px; height: 24px; }
+.panel { padding: 12px 14px; gap: 8px; border-radius: 16px; }
+.brand { flex-direction: row; align-items: center; gap: 12px; padding-top: 0; }
+.brand .logo { width: 48px; height: 48px; font-size: 27px; flex: none; }
+.brand h1 { font-size: 28px; }
+.brand p { font-size: 15px; line-height: 1.3; }
+.setup-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.setup-row > * { min-width: 0; }
+.seg button { min-height: 46px; font-size: 15px; }
+.stepper { gap: 6px; }
+.stepper .btn { width: 46px; min-height: 46px; font-size: 22px; }
+.stepper .btn svg { width: 20px; height: 20px; }
+.stepper .val { font-size: 28px; }
+.players { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.players li { min-height: 44px; padding: 4px 4px 4px 10px; gap: 8px; border-radius: 12px; }
+.players .num { font-size: 13px; min-width: 1.4em; }
+.players .pname { font-size: 17px; }
+.chip { min-width: 36px; min-height: 36px; border-radius: 10px; }
+.chip svg { width: 16px; height: 16px; }
+.addrow { gap: 8px; }
+.addrow input { flex-basis: 160px; min-height: 48px; padding: 6px 14px; font-size: 18px; border-radius: 14px; }
+.addrow .btn { min-height: 48px; }
+details.rules { padding-block: 8px; }
+details.rules summary { min-height: 32px; font-size: 16px; }
+details.rules ol { font-size: 15px; gap: 6px; }
+.role { padding: 12px 14px; gap: 4px; }
+.role.odd svg { width: 40px; height: 40px; }
+.role.odd .big { font-size: 28px; }
+.role.odd p, .role.same { font-size: 16px; }
+.vote-grid { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; }
+.vote { min-height: 66px; padding: 8px 6px; gap: 4px; font-size: 17px; border-radius: 14px; }
+.vote .av { width: 28px; height: 28px; font-size: 14px; }
+.hero { margin-top: -12px; padding-top: 14px; padding-bottom: 14px; gap: 4px; }
+.hero svg { width: 30px; height: 30px; }
+.hero h1, .hero h2 { font-size: 26px; }
+.hero p { font-size: 16px; }
+.hero p b { color: inherit; }
+.qcards { grid-template-columns: 1fr 1fr; gap: 8px; }
+.qcard { padding: 10px 12px; gap: 6px; border-radius: 14px; border-top-width: 4px; }
+.qcard .label { font-size: 12px; gap: 6px; letter-spacing: .03em; }
+.qcard .qi { width: 24px; height: 24px; border-radius: 7px; flex: none; }
+.qcard .qi svg { width: 14px; height: 14px; }
+.qcard .qtext { font-size: 16px; }
+.qcard .who-list { font-size: 13px; }
+.callout { padding: 14px; font-size: 17px; border-radius: 16px; }
+.ask { font-size: 22px; text-align: center; }
+.points { gap: 4px; }
+.points p { font-size: 16px; }
+.scores { gap: 6px; }
+.scores li { padding: 6px 12px; gap: 3px 10px; border-radius: 12px; }
+.scores .rank, .scores .gain { font-size: 14px; }
+.scores .sname { font-size: 17px; }
+.scores .pts { font-size: 22px; }
+.bar { height: 5px; }
+.page-title { font-size: 26px; text-align: center; }
+/* Big groups: two-column scoreboard so 7-10 players still fit on one screen. */
+.scores.many { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.scores.many li { padding: 6px 8px; gap: 3px 6px; }
+.scores.many .sname { font-size: 15px; }
+.scores.many .gain { font-size: 12px; padding: 1px 5px; }
+.scores.many .pts { font-size: 19px; min-width: 1.2em; }
 </style>
 </head>
 <body>
@@ -983,10 +1052,11 @@ function viewSetup() {
   return '' +
     '<section class="brand">' +
       '<div class="logo" aria-hidden="true">?</div>' +
-      '<h1>The Odd Question</h1>' +
-      '<p class="muted">' + esc(t('tagline')) + '</p>' +
+      '<div><h1>The Odd Question</h1>' +
+      '<p class="muted">' + esc(t('tagline')) + '</p></div>' +
     '</section>' +
     (S.game ? '<button class="btn btn-go" data-act="continue">' + esc(t('continueGame')) + I.arrow + '</button>' : '') +
+    '<div class="setup-row">' +
     '<section class="stack">' +
       '<div class="label" id="lang-label">' + esc(t('language')) + '</div>' +
       '<div class="seg" role="group" aria-labelledby="lang-label">' +
@@ -994,6 +1064,15 @@ function viewSetup() {
         '<button data-act="lang" data-v="fr" aria-pressed="' + (S.lang === 'fr') + '" lang="fr">Français</button>' +
       '</div>' +
     '</section>' +
+    '<section class="stack">' +
+      '<div class="label" id="target-label">' + esc(t('target')) + '</div>' +
+      '<div class="stepper" role="group" aria-labelledby="target-label">' +
+        '<button class="btn btn-ghost" data-act="target" data-d="-1" aria-label="' + esc(t('fewer')) + '"' + (S.target <= 3 ? ' disabled' : '') + '>' + I.minus + '</button>' +
+        '<div class="val" aria-live="polite">' + S.target + '</div>' +
+        '<button class="btn btn-ghost" data-act="target" data-d="1" aria-label="' + esc(t('more')) + '"' + (S.target >= 50 ? ' disabled' : '') + '>' + I.plus + '</button>' +
+      '</div>' +
+    '</section>' +
+    '</div>' +
     '<section class="stack">' +
       '<div class="label">' + esc(t('players')) + ' · ' + n + ' / ' + MAX_P + '</div>' +
       (n ? '<ul class="players">' + list + '</ul>' : '<p class="muted">' + esc(t('playersHint')) + '</p>') +
@@ -1004,14 +1083,6 @@ function viewSetup() {
           '</form>'
         : '<p class="muted">' + esc(t('full')) + '</p>') +
       (ui.error ? '<p class="error" role="alert">' + esc(ui.error) + '</p>' : '') +
-    '</section>' +
-    '<section class="stack">' +
-      '<div class="label" id="target-label">' + esc(t('target')) + '</div>' +
-      '<div class="stepper" role="group" aria-labelledby="target-label">' +
-        '<button class="btn btn-ghost" data-act="target" data-d="-1" aria-label="' + esc(t('fewer')) + '"' + (S.target <= 3 ? ' disabled' : '') + '>' + I.minus + '</button>' +
-        '<div class="val" aria-live="polite">' + S.target + '</div>' +
-        '<button class="btn btn-ghost" data-act="target" data-d="1" aria-label="' + esc(t('more')) + '"' + (S.target >= 50 ? ' disabled' : '') + '>' + I.plus + '</button>' +
-      '</div>' +
     '</section>' +
     '<details class="rules panel"><summary>' + esc(t('rulesTitle')) + '</summary><ol>' +
       t('rules').map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('') +
@@ -1102,16 +1173,14 @@ function questionCards(g) {
 function viewReveal(g) {
   var caught = g.accused === g.odd;
   var hero = caught
-    ? '<div class="hero caught">' + I.target + '<h2>' + esc(t('caught')) + '</h2><p>' + esc(t('caughtSub')) + '</p></div>' +
-      '<div class="strip">' + I.check + '<span>' + bold('caughtStrip', g.odd) + '</span></div>'
-    : '<div class="hero escaped">' + I.run + '<h2>' + esc(t('escaped')) + '</h2><p>' + esc(t('heroEscapedSub')) + '</p></div>' +
-      '<div class="strip">' + I.ban + '<span>' + bold('escapedSub', g.accused) + '</span></div>';
+    ? '<div class="hero caught">' + I.target + '<h2>' + esc(t('caught')) + '</h2><p>' + bold('caughtStrip', g.odd) + '</p></div>'
+    : '<div class="hero escaped">' + I.run + '<h2>' + esc(t('escaped')) + '</h2><p>' + bold('escapedSub', g.accused) + ' ' + esc(t('heroEscapedSub')) + '</p></div>';
   var body = '', dock = '';
   if (g.revealStep === 'guessing') {
     body = '<div class="callout">' + bold('guessAsk', g.odd) + '</div>';
     dock = '<button class="btn btn-go" data-act="showqs">' + I.arrow + esc(t('showQs')) + '</button>';
   } else if (g.revealStep === 'questions') {
-    body = questionCards(g) + '<h2 class="center" style="font-size:clamp(30px,7.5vw,40px)">' + esc(t('didGuess', { name: g.odd })) + '</h2>';
+    body = questionCards(g) + '<h2 class="ask">' + esc(t('didGuess', { name: g.odd })) + '</h2>';
     dock = '<div class="row">' +
       '<button class="btn btn-go" data-act="guess" data-v="1">' + esc(t('yes')) + '</button>' +
       '<button class="btn btn-ghost" data-act="guess" data-v="0">' + esc(t('no')) + '</button></div>';
@@ -1132,7 +1201,7 @@ function viewReveal(g) {
 function scoreList(g) {
   var ranked = g.players.slice().sort(function (a, b) { return g.scores[b] - g.scores[a]; });
   var top = g.scores[ranked[0]];
-  return '<ul class="scores">' + ranked.map(function (p, i) {
+  return '<ul class="scores' + (ranked.length > 6 ? ' many' : '') + '">' + ranked.map(function (p, i) {
     var gain = g.gains[p] || 0;
     var pct = Math.min(100, Math.round(g.scores[p] / S.target * 100));
     return '<li class="' + (top > 0 && g.scores[p] === top ? 'lead' : '') + '">' +
@@ -1147,8 +1216,7 @@ function scoreList(g) {
 
 function viewScores(g) {
   return topbar(g) +
-    '<div class="eyebrow">' + esc(t('standings')) + '</div>' +
-    '<h2 class="center">' + esc(t('scores')) + '</h2>' +
+    '<h2 class="page-title">' + esc(t('scores')) + '</h2>' +
     '<p class="muted center">' + esc(t('firstTo', { n: S.target })) + '</p>' +
     scoreList(g) +
     '<div class="dock"><button class="btn btn-go" data-act="nextround">' + I.arrow + esc(t('nextRound')) + '</button></div>';
@@ -1159,12 +1227,12 @@ function viewWinner(g) {
   g.players.forEach(function (p) { max = Math.max(max, g.scores[p]); });
   var winners = g.players.filter(function (p) { return g.scores[p] === max; });
   var title = winners.length === 1 ? esc(t('wins', { name: winners[0] })) : t('tieWin', { names: joinNames(winners) });
-  return '<div class="hero win">' + I.trophy + '<h1 style="font-size:clamp(38px,10vw,56px)">' + title + '</h1></div>' +
+  return '<div class="hero win">' + I.trophy + '<h1>' + title + '</h1></div>' +
     scoreList(g) +
-    '<div class="dock">' +
-      '<button class="btn btn-go" data-act="again">' + I.arrow + esc(t('playAgain')) + '</button>' +
+    '<div class="dock"><div class="row">' +
       '<button class="btn btn-ghost" data-act="change">' + esc(t('changePlayers')) + '</button>' +
-    '</div>';
+      '<button class="btn btn-go" data-act="again">' + I.arrow + esc(t('playAgain')) + '</button>' +
+    '</div></div>';
 }
 
 function viewMenu() {
